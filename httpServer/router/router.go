@@ -4,11 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"httpServer/app"
-	"httpServer/controller"
-	_ "httpServer/docs"
-	"httpServer/migrate"
-	"httpServer/pkg/middleware"
+	_ "ioa/docs"
+	"ioa/httpServer/app"
+	"ioa/httpServer/controller"
+	"ioa/httpServer/migrate"
+	"ioa/httpServer/pkg/middleware"
 )
 
 func Start() {
@@ -47,6 +47,28 @@ func Start() {
 		apiGroupGroup.PUT("/:apiGroupId", apiGroupController.Put)
 		apiGroupGroup.GET("/:apiGroupId", apiGroupController.Get)
 		apiGroupGroup.PATCH("/:apiGroupId", apiGroupController.Patch)
+	}
+
+	pluginController := controller.PluginController{}
+	pluginGroup := r.Group("/plugins")
+	{
+		pluginGroup.GET("", pluginController.List)
+		pluginGroup.POST("", pluginController.Create)
+		pluginGroup.DELETE("/:pluginId", pluginController.Delete)
+		pluginGroup.PUT("/:pluginId", pluginController.Put)
+		pluginGroup.GET("/:pluginId", pluginController.Get)
+		pluginGroup.PATCH("/:pluginId", pluginController.Patch)
+	}
+
+	policyController := controller.PolicyController{}
+	policyGroup := r.Group("/policys")
+	{
+		policyGroup.GET("", policyController.List)
+		policyGroup.POST("", policyController.Create)
+		policyGroup.DELETE("/:policyId", policyController.Delete)
+		policyGroup.PUT("/:policyId", policyController.Put)
+		policyGroup.GET("/:policyId", policyController.Get)
+		policyGroup.PATCH("/:policyId", policyController.Patch)
 	}
 
 	//!!do not delete gen will generate router code at here

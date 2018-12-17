@@ -3,8 +3,8 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"httpServer/model"
-	"httpServer/pkg"
+	"ioa/httpServer/model"
+	"ioa/httpServer/pkg"
 	"net/http"
 	"strconv"
 )

@@ -1,8 +1,8 @@
 package migrate
 
 import (
-	"httpServer/app"
-	"httpServer/model"
+	"ioa/httpServer/app"
+	"ioa/httpServer/model"
 )
 
 func CreateTable() {
@@ -14,7 +14,8 @@ func CreateTable() {
 		&model.Param{},
 		&model.Policy{},
 		&model.Target{},
-	//!!do not delete the line, gen generate code at here
+		&model.Plugin{},
+		//!!do not delete the line, gen generate code at here
 
 	)
 }

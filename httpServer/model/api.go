@@ -2,7 +2,7 @@
 package model
 
 import (
-	"httpServer/app"
+	"ioa/httpServer/app"
 )
 
 type Api struct {
@@ -10,12 +10,13 @@ type Api struct {
 	ApiGroupId string `json:"apiGroupId"`
 	Name       string `json:"name"`
 	Describe   string `json:"describe"`
+	Path       string `json:"path"`
 	Method     string `json:"method"`
 	Status     string `json:"status"`
 
-	Targets  []Target    `json:"targets"`
-	Params   []Param     `json:"params"`
-	Policies []ApiPolicy `json:"policies"`
+	Targets  []Target `json:"targets"`
+	Params   []Param  `json:"params"`
+	Policies string   `json:"policies"`
 }
 
 func (api *Api) Insert() error {

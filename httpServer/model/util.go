@@ -3,7 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/jinzhu/gorm"
-	"httpServer/pkg/util"
+	"ioa/httpServer/pkg/util"
 	"strings"
 	"time"
 )

@@ -2,14 +2,14 @@
 package model
 
 import (
-	"httpServer/app"
+	"ioa/httpServer/app"
 )
 
 type Policy struct {
 	Common
-	Name             string `json:"name"`
-	Describe         string `json:"describe"`
-	Plugin_file_name string `json:"plugin_file_name"`
+	Name    string `json:"name"`
+	Desc    string `json:"desc"`
+	Plugins string `json:"plugins"`
 }
 
 func (policy *Policy) Insert() error {

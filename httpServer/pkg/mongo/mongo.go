@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
-	"httpServer/app"
+	"ioa/httpServer/app"
 )
 
 func mgoExec(collectionName string, f func(*mgo.Collection) error) error {

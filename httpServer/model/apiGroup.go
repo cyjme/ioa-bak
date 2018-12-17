@@ -2,7 +2,7 @@
 package model
 
 import (
-	"httpServer/app"
+	"ioa/httpServer/app"
 )
 
 type ApiGroup struct {
@@ -11,8 +11,8 @@ type ApiGroup struct {
 	Describe  string `json:"describe"`
 	IsDefault bool   `json:"isDefault"`
 
-	Apis      []Api            `json:"apis"`
-	Policies  []ApiGroupPolicy `json:"policies"`
+	Apis     []Api  `json:"apis"`
+	Policies string `json:"policies"`
 }
 
 func (apiGroup *ApiGroup) Insert() error {
@@ -41,7 +41,7 @@ func (apiGroup *ApiGroup) List(rawQuery string, rawOrder string, offset int, lim
 	apiGroups := []ApiGroup{}
 	total := 0
 
-	db := app.DB.Model(apiGroup).Preload("Apis").Preload("Policies").Preload("Apis.Targets").Preload("Apis.Params").Preload("Apis.Policies")
+	db := app.DB.Model(apiGroup).Preload("Apis").Preload("Apis.Targets").Preload("Apis.Params")
 
 	db, err := buildWhere(rawQuery, db)
 	if err != nil {
