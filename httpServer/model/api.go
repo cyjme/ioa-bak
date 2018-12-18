@@ -17,6 +17,7 @@ type Api struct {
 	Targets  []Target `json:"targets"`
 	Params   []Param  `json:"params"`
 	Policies string   `json:"policies"`
+	Plugins  string   `json:"plugins"`
 }
 
 func (api *Api) Insert() error {

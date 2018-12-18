@@ -7,14 +7,10 @@ import (
 	_ "ioa/docs"
 	"ioa/httpServer/app"
 	"ioa/httpServer/controller"
-	"ioa/httpServer/migrate"
 	"ioa/httpServer/pkg/middleware"
 )
 
 func Start() {
-	app.InitConfig()
-	app.InitDB()
-	migrate.CreateTable()
 
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())

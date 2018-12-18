@@ -7,10 +7,10 @@ import (
 
 type Param struct {
 	Common
-	ApiId       string `json:"apiId"`
-	Location    string `json:"location"`
-	Name        string `json:"name"`
-	Target_name string `json:"target_name"`
+	ApiId      string `json:"apiId"`
+	Location   string `json:"location"`
+	Name       string `json:"name"`
+	TargetName string `json:"targetName"`
 }
 
 func (param *Param) Insert() error {

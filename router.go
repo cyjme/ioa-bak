@@ -1,4 +1,4 @@
-package main
+package ioa
 
 import (
 	"ioa/httpServer/model"

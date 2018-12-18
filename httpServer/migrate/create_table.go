@@ -9,8 +9,6 @@ func CreateTable() {
 	app.DB.AutoMigrate(
 		&model.Api{},
 		&model.ApiGroup{},
-		&model.ApiPolicy{},
-		&model.ApiGroupPolicy{},
 		&model.Param{},
 		&model.Policy{},
 		&model.Target{},

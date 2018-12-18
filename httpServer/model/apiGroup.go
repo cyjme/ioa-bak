@@ -13,6 +13,7 @@ type ApiGroup struct {
 
 	Apis     []Api  `json:"apis"`
 	Policies string `json:"policies"`
+	Plugins  string `json:"plugins"`
 }
 
 func (apiGroup *ApiGroup) Insert() error {

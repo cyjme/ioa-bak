@@ -1,12 +1,12 @@
-package main
+package ioa
 
 import (
-	"ioa/httpServer/model"
 	"net/http"
 )
 
 type Context struct {
-	Api            model.Api
+	Plugins        []string
+	Api            Api
 	Request        http.Request
 	ResponseWriter http.ResponseWriter
 }
