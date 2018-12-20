@@ -1,12 +1,17 @@
 package main
 
 import (
+	"golang.org/x/time/rate"
 	"ioa/plugin"
 	"log"
 	"net/http"
 )
 
 type ioaPlugin struct {
+}
+
+func (s ioaPlugin) Init() {
+	var limiter = rate.NewLimiter(2, 5)
 }
 
 func (s ioaPlugin) GetName() string {
@@ -21,6 +26,7 @@ func (s ioaPlugin) GetConfigTemplate() plugin.Config {
 }
 
 func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) {
+
 	contentLength := r.ContentLength
 	maxSize := config["maxSize"].(int64)
 

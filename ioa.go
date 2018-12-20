@@ -4,13 +4,17 @@ import (
 	"encoding/json"
 	"ioa/httpServer/model"
 	"ioa/plugin"
+	"ioa/router"
 	"log"
 	"net/http"
 )
 
-var Count int64
-var Apis []Api
+var Apis = make(map[string]Api)
 var PluginCenter *plugin.PluginCenter
+
+type PluginConfig map[string]string
+
+var Router = router.NewRouter()
 
 type Api struct {
 	model.Common
@@ -28,11 +32,14 @@ type Api struct {
 	Plugins       []string       `json:"plugins"`
 	GroupPlugins  []string       `json:"groupPlugins"`
 	AllPlugin     []string       `json:"allPlugin"`
+	PluginConfig  PluginConfig   `json:"pluginConfig"`
 }
 
 func StartServer() {
 	log.Println("load Api from database")
 	LoadApi()
+	loadApiToRouter()
+
 	log.Println("load Api from database Success:", Apis)
 	PluginCenter = plugin.NewPluginCenter()
 	PluginCenter.Register("001", "./plugins/size.so")
@@ -42,16 +49,28 @@ func StartServer() {
 }
 
 func ReverseProxy(w http.ResponseWriter, r *http.Request) {
-	PluginCenter.Plugins["001"].Run(w, r)
+	method := r.Method
+	path := r.URL.Path
+	apiId, params, _ := Router.FindRoute(method, path)
+	log.Println("api id is :", apiId)
+	log.Println("api params is :", params)
+	//todo match api, get model.Api
+
+	PluginCenter.Plugins["001"].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
 	name := PluginCenter.Plugins["001"].GetName()
 	log.Println("name is ", name)
 
 	w.Write([]byte("ok"))
 	log.Println("receive request")
-	//todo  use httpRouter get apiId
 
-	//todo match api, get model.Api
 	//todo plugin
+}
+
+func loadApiToRouter() {
+	log.Println("apissssss",Apis)
+	for id, api := range Apis {
+		Router.AddRoute(api.Method, api.Path, id)
+	}
 }
 
 func LoadApi() {
@@ -103,6 +122,15 @@ func LoadApi() {
 			newApiAllPlugins = append(newApiAllPlugins, apiPoliciesPlugins...)
 			newApiAllPlugins = append(newApiAllPlugins, newApiPlugins...)
 
+			var newApiPluginConfig PluginConfig
+			//处理 api 的 pluginConfig
+			if api.PluginConfig != "" {
+				err := json.Unmarshal([]byte(api.PluginConfig), &newApiPluginConfig)
+				if err != nil {
+					log.Println("api pluginConfig Unmarshal error")
+				}
+			}
+
 			newApi := Api{
 				ApiGroupId: api.ApiGroupId,
 				Name:       api.Name,
@@ -118,9 +146,10 @@ func LoadApi() {
 				GroupPlugins:  apiGroupPlugins,
 				Plugins:       newApiPlugins,
 				AllPlugin:     newApiAllPlugins,
+				PluginConfig:  newApiPluginConfig,
 			}
 
-			Apis = append(Apis, newApi)
+			Apis[api.Id] = newApi
 		}
 	}
 }
