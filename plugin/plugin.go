@@ -7,39 +7,40 @@ import (
 )
 
 type PluginCenter struct {
-	Plugins map[string]Plugin
+	Plugins map[string]IoaPlugin
 }
 
-type Plugin struct {
-	Id  string
-	Run func(w http.ResponseWriter, r *http.Request)
+type IoaPlugin interface {
+	GetName() string
+	GetConfig()
+	Run(w http.ResponseWriter, r *http.Request)
 }
 
 func NewPluginCenter() *PluginCenter {
 	return &PluginCenter{
-		Plugins: make(map[string]Plugin),
+		Plugins: make(map[string]IoaPlugin),
 	}
 }
 
 func (p *PluginCenter) Register(id string, path string) {
 	plugin, err := plugin.Open(path)
+
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	symbol, err := plugin.Lookup("Run")
+	symbol, err := plugin.Lookup("SizePlugin")
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("lookup plugin error", err.Error())
 	}
-	runFunction, ok := symbol.(func(w http.ResponseWriter, r *http.Request))
+
+	var ioaPlugin IoaPlugin
+	ioaPlugin, ok := symbol.(IoaPlugin)
 
 	if !ok {
-		log.Println("function type not match func(w http.ResponseWriter, r *http.Request)")
+		log.Println("load plugin error")
 		return
 	}
 
-	p.Plugins[id] = Plugin{
-		Id:  id,
-		Run: runFunction,
-	}
+	p.Plugins[id] = ioaPlugin
 }

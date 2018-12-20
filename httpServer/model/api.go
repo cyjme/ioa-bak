@@ -14,10 +14,11 @@ type Api struct {
 	Method     string `json:"method"`
 	Status     string `json:"status"`
 
-	Targets  []Target `json:"targets"`
-	Params   []Param  `json:"params"`
-	Policies string   `json:"policies"`
-	Plugins  string   `json:"plugins"`
+	Targets      []Target `json:"targets"`
+	Params       []Param  `json:"params"`
+	Policies     string   `json:"policies"`
+	Plugins      string   `json:"plugins"`
+	PluginConfig string   `json:"pluginConfig"`
 }
 
 func (api *Api) Insert() error {

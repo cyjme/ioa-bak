@@ -35,8 +35,7 @@ func StartServer() {
 	LoadApi()
 	log.Println("load Api from database Success:", Apis)
 	PluginCenter = plugin.NewPluginCenter()
-	PluginCenter.Register("001", "./plugins/count.so")
-	PluginCenter.Register("002", "./plugins/size.so")
+	PluginCenter.Register("001", "./plugins/size.so")
 
 	http.HandleFunc("/", ReverseProxy)
 	http.ListenAndServe(":11112", nil)
@@ -44,7 +43,9 @@ func StartServer() {
 
 func ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	PluginCenter.Plugins["001"].Run(w, r)
-	PluginCenter.Plugins["002"].Run(w, r)
+	name := PluginCenter.Plugins["001"].GetName()
+	log.Println("name is ", name)
+
 	w.Write([]byte("ok"))
 	log.Println("receive request")
 	//todo  use httpRouter get apiId
@@ -76,8 +77,6 @@ func LoadApi() {
 
 			var plugins []string
 			json.Unmarshal([]byte(policy.Plugins), &plugins)
-
-			log.Println("test", plugins)
 
 			groupPoliciesPlugins = append(groupPoliciesPlugins, plugins...)
 		}
