@@ -4,13 +4,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"ioa"
 	_ "ioa/docs"
 	"ioa/httpServer/app"
 	"ioa/httpServer/controller"
 	"ioa/httpServer/pkg/middleware"
+	"net/http"
 )
 
-func Start() {
+func Start(ioa *ioa.Ioa) {
 
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
@@ -55,6 +57,11 @@ func Start() {
 		pluginGroup.GET("/:pluginId", pluginController.Get)
 		pluginGroup.PATCH("/:pluginId", pluginController.Patch)
 	}
+
+	r.GET("/pluginTpl/:pluginId", func(c *gin.Context) {
+		configTpl := ioa.Plugins.GetPluginConfigTpl(c.Param("pluginId"))
+		c.JSON(http.StatusOK, configTpl)
+	})
 
 	policyController := controller.PolicyController{}
 	policyGroup := r.Group("/policys")

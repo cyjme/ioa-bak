@@ -6,31 +6,31 @@ import (
 	"plugin"
 )
 
-type PluginCenter struct {
-	Plugins map[string]IoaPlugin
-}
+type Plugin map[string]IoaPlugin
 
 type Field struct {
 	Name      string
+	Desc      string
 	Required  bool
 	FieldType string
 }
 
-type Config []Field
+type ConfigTpl []Field
 
 type IoaPlugin interface {
 	GetName() string
-	GetConfigTemplate() Config
+	GetConfigTemplate() ConfigTpl
 	Run(w http.ResponseWriter, r *http.Request, config map[string]interface{})
 }
 
-func NewPluginCenter() *PluginCenter {
-	return &PluginCenter{
-		Plugins: make(map[string]IoaPlugin),
-	}
+func (p Plugin) GetPluginConfigTpl(id string) ConfigTpl {
+	var configTpl ConfigTpl
+	configTpl = p[id].GetConfigTemplate()
+
+	return configTpl
 }
 
-func (p *PluginCenter) Register(id string, path string) {
+func (p Plugin) Register(id string, path string) {
 	plugin, err := plugin.Open(path)
 
 	if err != nil {
@@ -50,5 +50,5 @@ func (p *PluginCenter) Register(id string, path string) {
 		return
 	}
 
-	p.Plugins[id] = ioaPlugin
+	p[id] = ioaPlugin
 }

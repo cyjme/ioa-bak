@@ -9,12 +9,19 @@ import (
 	"net/http"
 )
 
-var Apis = make(map[string]Api)
-var PluginCenter *plugin.PluginCenter
+type Ioa struct {
+	Apis    map[string]Api
+	Plugins plugin.Plugin
+	Router  router.Router
+}
 
-type PluginConfig map[string]string
-
-var Router = router.NewRouter()
+func New() *Ioa {
+	return &Ioa{
+		Apis:    make(map[string]Api),
+		Plugins: make(plugin.Plugin),
+		Router:  router.New(),
+	}
+}
 
 type Api struct {
 	model.Common
@@ -25,39 +32,38 @@ type Api struct {
 	Method     string `json:"method"`
 	Status     string `json:"status"`
 
-	Targets       []model.Target `json:"targets"`
-	Params        []model.Param  `json:"params"`
-	Policies      []string       `json:"policies"`
-	GroupPolicies []string       `json:"groupPolicies"`
-	Plugins       []string       `json:"plugins"`
-	GroupPlugins  []string       `json:"groupPlugins"`
-	AllPlugin     []string       `json:"allPlugin"`
-	PluginConfig  PluginConfig   `json:"pluginConfig"`
+	Targets       []model.Target    `json:"targets"`
+	Params        []model.Param     `json:"params"`
+	Policies      []string          `json:"policies"`
+	GroupPolicies []string          `json:"groupPolicies"`
+	Plugins       []string          `json:"plugins"`
+	GroupPlugins  []string          `json:"groupPlugins"`
+	AllPlugin     []string          `json:"allPlugin"`
+	PluginConfig  map[string]string `json:"pluginConfig"`
 }
 
-func StartServer() {
+func (ioa *Ioa) StartServer() {
 	log.Println("load Api from database")
-	LoadApi()
-	loadApiToRouter()
+	ioa.LoadApi()
+	ioa.loadApiToRouter()
 
-	log.Println("load Api from database Success:", Apis)
-	PluginCenter = plugin.NewPluginCenter()
-	PluginCenter.Register("001", "./plugins/size.so")
+	log.Println("load Api from database Success:", ioa.Apis)
+	ioa.Plugins.Register("1", "./plugins/size.so")
 
-	http.HandleFunc("/", ReverseProxy)
+	http.HandleFunc("/", ioa.ReverseProxy)
 	http.ListenAndServe(":11112", nil)
 }
 
-func ReverseProxy(w http.ResponseWriter, r *http.Request) {
+func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	path := r.URL.Path
-	apiId, params, _ := Router.FindRoute(method, path)
+	apiId, params, _ := ioa.Router.FindRoute(method, path)
 	log.Println("api id is :", apiId)
 	log.Println("api params is :", params)
 	//todo match api, get model.Api
 
-	PluginCenter.Plugins["001"].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
-	name := PluginCenter.Plugins["001"].GetName()
+	ioa.Plugins["001"].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
+	name := ioa.Plugins["001"].GetName()
 	log.Println("name is ", name)
 
 	w.Write([]byte("ok"))
@@ -66,14 +72,14 @@ func ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	//todo plugin
 }
 
-func loadApiToRouter() {
-	log.Println("apissssss",Apis)
-	for id, api := range Apis {
-		Router.AddRoute(api.Method, api.Path, id)
+func (ioa *Ioa) loadApiToRouter() {
+	log.Println("apissssss", ioa.Apis)
+	for id, api := range ioa.Apis {
+		ioa.Router.AddRoute(api.Method, api.Path, id)
 	}
 }
 
-func LoadApi() {
+func (ioa *Ioa) LoadApi() {
 	apiGroup := model.ApiGroup{}
 	apiGroups, _, err := apiGroup.List("", "", -1, -1)
 	if err != nil {
@@ -122,7 +128,7 @@ func LoadApi() {
 			newApiAllPlugins = append(newApiAllPlugins, apiPoliciesPlugins...)
 			newApiAllPlugins = append(newApiAllPlugins, newApiPlugins...)
 
-			var newApiPluginConfig PluginConfig
+			var newApiPluginConfig map[string]string
 			//处理 api 的 pluginConfig
 			if api.PluginConfig != "" {
 				err := json.Unmarshal([]byte(api.PluginConfig), &newApiPluginConfig)
@@ -149,7 +155,7 @@ func LoadApi() {
 				PluginConfig:  newApiPluginConfig,
 			}
 
-			Apis[api.Id] = newApi
+			ioa.Apis[api.Id] = newApi
 		}
 	}
 }

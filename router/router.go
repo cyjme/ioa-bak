@@ -8,7 +8,7 @@ type Router struct {
 	router *httprouter.Router
 }
 
-func NewRouter() Router {
+func New() Router {
 	return Router{
 		router: httprouter.New(),
 	}

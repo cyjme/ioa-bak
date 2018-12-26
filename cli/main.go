@@ -11,6 +11,8 @@ func main() {
 	app.InitConfig()
 	app.InitDB()
 	migrate.CreateTable()
-	go httpServer.Run()
-	ioa.StartServer()
+	Ioa := ioa.New()
+	go httpServer.Run(Ioa)
+
+	Ioa.StartServer()
 }

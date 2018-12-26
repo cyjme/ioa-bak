@@ -1,7 +1,10 @@
 package httpServer
 
-import "ioa/httpServer/router"
+import (
+	"ioa"
+	"ioa/httpServer/router"
+)
 
-func Run() {
-	router.Start()
+func Run(ioa *ioa.Ioa) {
+	router.Start(ioa)
 }

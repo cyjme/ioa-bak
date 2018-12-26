@@ -13,11 +13,22 @@ func (s ioaPlugin) GetName() string {
 	return "request_size"
 }
 
-func (s ioaPlugin) GetConfigTemplate() plugin.Config {
-	config := plugin.Config{
-		{Name: "maxSize", Required: true, FieldType: "int64"},
+//type ioaConfig struct {
+//}
+//
+//func (s ioaPlugin) ParseConfig(configString string) ioaConfig {
+//	var newConfig ioaConfig
+//	json.Unmarshal([]byte(configString), &newConfig)
+//
+//	return newConfig
+//}
+
+func (s ioaPlugin) GetConfigTemplate() plugin.ConfigTpl {
+	configTpl := plugin.ConfigTpl{
+		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
 	}
-	return config
+
+	return configTpl
 }
 
 func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) {
