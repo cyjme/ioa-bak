@@ -8,8 +8,8 @@ var Config config
 
 type config struct {
 	Http struct {
-		Domain string `mapstructure:"domain"`
-		Port   string `mapstructure:"port"`
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
 	} `mapstructure:"http"`
 	DB struct {
 		Host               string `mapstructure:"host"`
@@ -20,6 +20,10 @@ type config struct {
 		MaxIdleConnections int    `mapstructure:"max_idle_connections"`
 		MaxOpenConnections int    `mapstructure:"max_idle_connections"`
 	} `mapstructure:"db"`
+	Ioa struct {
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+	}
 }
 
 func InitConfig() {

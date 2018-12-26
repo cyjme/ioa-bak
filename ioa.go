@@ -2,6 +2,7 @@ package ioa
 
 import (
 	"encoding/json"
+	"ioa/httpServer/app"
 	"ioa/httpServer/model"
 	"ioa/plugin"
 	"ioa/router"
@@ -51,7 +52,9 @@ func (ioa *Ioa) StartServer() {
 	ioa.Plugins.Register("1", "./plugins/size.so")
 
 	http.HandleFunc("/", ioa.ReverseProxy)
-	http.ListenAndServe(":11112", nil)
+
+	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
+	http.ListenAndServe(addr, nil)
 }
 
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {

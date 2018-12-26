@@ -76,7 +76,7 @@ func Start(ioa *ioa.Ioa) {
 
 	//!!do not delete gen will generate router code at here
 
-	addr := app.Config.Http.Domain + ":" + app.Config.Http.Port
+	addr := app.Config.Http.Host + ":" + app.Config.Http.Port
 
 	r.Run(addr) // listen and serve on 0.0.0.0:8080
 }
