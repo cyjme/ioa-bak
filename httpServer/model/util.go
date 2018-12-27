@@ -9,7 +9,7 @@ import (
 )
 
 type Common struct {
-	Id        string     `gorm:"primary_key" json:"id"`
+	Id        string     `gorm:"primary_key" json:"id" sql:"type:varchar(36)"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
