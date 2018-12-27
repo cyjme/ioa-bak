@@ -1,6 +1,6 @@
 all:
-	GOOS=linux GOARCH=amd64 go build -tags netcgo -a -v -o ./release/ioa ./cli/main.go
-	GOOS=linux GOARCH=amd64 go build -tags netcgo -a -v -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
+	GOOS=linux GOARCH=amd64 go build -tags netgo -a -v -o ./release/ioa ./cli/main.go
+	GOOS=linux GOARCH=amd64 go build -tags netgo -a -v -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 clean:
 	@rm -rf ./release/*
 gotool:
