@@ -24,6 +24,10 @@ func Start(ioa *ioa.Ioa) {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
+	r.GET("/pinga", func(context *gin.Context) {
+		context.Writer.Write([]byte("pong"))
+	})
+
 	apiController := controller.ApiController{}
 	apiGroup := r.Group("/apis")
 	{

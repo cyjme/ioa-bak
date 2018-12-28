@@ -60,30 +60,37 @@ func (ioa *Ioa) StartServer() {
 }
 
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
+	log.Println("***********************", r.URL.Scheme)
 	method := r.Method
 	path := r.URL.Path
 	apiId, params, _ := ioa.Router.FindRoute(method, path)
 	log.Println("api id is :", apiId)
 	log.Println("api params is :", params)
 	//todo match api, get model.Api
+	api := ioa.Apis[apiId]
 
-	ioa.Plugins["001"].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
-	name := ioa.Plugins["001"].GetName()
-	log.Println("name is ", name)
-	w.Write([]byte("ok"))
+	for _, pluginId := range api.Plugins {
+		name := ioa.Plugins[pluginId].GetName()
+		log.Println("plugin will run", name)
+		ioa.Plugins[pluginId].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
+	}
 	log.Println("receive request")
 
 	//todo find upstream info, and reverseProxy
-	api := ioa.Apis[apiId]
-	req := new(http.Request)
+	targetsLen := len(api.Targets)
+	if targetsLen == 0 {
+		w.Write([]byte("no target"))
+		return
+	}
 
 	target := api.Targets[rand.Intn(len(api.Targets))]
 
-	req.URL.Host = target.Host + ":" + target.Port
-	req.URL.Scheme = target.Scheme
-	req.URL.Path = target.Path
+	director := func(req *http.Request) {
+		req.URL.Host = target.Host + ":" + target.Port
+		req.URL.Scheme = target.Scheme
+		req.URL.Path = target.Path
+	}
 
-	director := func(req *http.Request) {}
 	proxy := &httputil.ReverseProxy{Director: director}
 	proxy.ServeHTTP(w, r)
 	//todo plugin
