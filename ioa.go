@@ -7,7 +7,9 @@ import (
 	"ioa/plugin"
 	"ioa/router"
 	"log"
+	"math/rand"
 	"net/http"
+	"net/http/httputil"
 )
 
 type Ioa struct {
@@ -68,10 +70,22 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	ioa.Plugins["001"].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
 	name := ioa.Plugins["001"].GetName()
 	log.Println("name is ", name)
-
 	w.Write([]byte("ok"))
 	log.Println("receive request")
 
+	//todo find upstream info, and reverseProxy
+	api := ioa.Apis[apiId]
+	req := new(http.Request)
+
+	target := api.Targets[rand.Intn(len(api.Targets))]
+
+	req.URL.Host = target.Host + ":" + target.Port
+	req.URL.Scheme = target.Scheme
+	req.URL.Path = target.Path
+
+	director := func(req *http.Request) {}
+	proxy := &httputil.ReverseProxy{Director: director}
+	proxy.ServeHTTP(w, r)
 	//todo plugin
 }
 
