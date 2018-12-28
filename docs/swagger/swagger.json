@@ -563,6 +563,34 @@
                 }
             }
         },
+        "/plugins/{pluginId}/configTpl": {
+            "get": {
+                "tags": [
+                    "Plugin"
+                ],
+                "summary": "Get",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "pluginId",
+                        "name": "pluginId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "plugin ConfigTpl",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/plugin.Field"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/policys": {
             "get": {
                 "tags": [
@@ -958,6 +986,23 @@
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "plugin.Field": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "fieldType": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "required": {
+                    "type": "boolean"
                 }
             }
         }

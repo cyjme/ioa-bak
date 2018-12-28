@@ -9,7 +9,6 @@ import (
 	"ioa/httpServer/app"
 	"ioa/httpServer/controller"
 	"ioa/httpServer/pkg/middleware"
-	"net/http"
 )
 
 func Start(ioa *ioa.Ioa) {
@@ -56,12 +55,11 @@ func Start(ioa *ioa.Ioa) {
 		pluginGroup.PUT("/:pluginId", pluginController.Put)
 		pluginGroup.GET("/:pluginId", pluginController.Get)
 		pluginGroup.PATCH("/:pluginId", pluginController.Patch)
-	}
 
-	r.GET("/pluginTpl/:pluginId", func(c *gin.Context) {
-		configTpl := ioa.Plugins.GetPluginConfigTpl(c.Param("pluginId"))
-		c.JSON(http.StatusOK, configTpl)
-	})
+		pluginGroup.GET("/:pluginId/configTpl", func(c *gin.Context) {
+			pluginController.GetPluginConfigTpl(c, ioa)
+		})
+	}
 
 	policyController := controller.PolicyController{}
 	policyGroup := r.Group("/policys")

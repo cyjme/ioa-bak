@@ -9,10 +9,10 @@ import (
 type Plugin map[string]IoaPlugin
 
 type Field struct {
-	Name      string
-	Desc      string
-	Required  bool
-	FieldType string
+	Name      string `json:"name"`
+	Desc      string `json:"desc"`
+	Required  bool   `json:"required"`
+	FieldType string `json:"fieldType"`
 }
 
 type ConfigTpl []Field

@@ -137,6 +137,17 @@ definitions:
       updatedAt:
         type: string
     type: object
+  plugin.Field:
+    properties:
+      desc:
+        type: string
+      fieldType:
+        type: string
+      name:
+        type: string
+      required:
+        type: boolean
+    type: object
 info:
   contact: {}
   license: {}
@@ -505,6 +516,24 @@ paths:
           schema:
             type: string
       summary: Put
+      tags:
+      - Plugin
+  /plugins/{pluginId}/configTpl:
+    get:
+      parameters:
+      - description: pluginId
+        in: path
+        name: pluginId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: plugin ConfigTpl
+          schema:
+            items:
+              $ref: '#/definitions/plugin.Field'
+            type: array
+      summary: Get
       tags:
       - Plugin
   /policys:

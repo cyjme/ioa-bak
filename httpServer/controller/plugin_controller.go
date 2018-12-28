@@ -3,6 +3,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"ioa"
 	"ioa/httpServer/model"
 	"ioa/httpServer/pkg"
 	"net/http"
@@ -152,4 +153,14 @@ func (ctl *PluginController) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, plugin)
+}
+
+// @Summary Get
+// @Tags    Plugin
+// @Param  pluginId path string true "pluginId"
+// @Success 200 {array} plugin.Field "plugin ConfigTpl"
+// @Router /plugins/{pluginId}/configTpl [get]
+func (ctl *PluginController) GetPluginConfigTpl(c *gin.Context,ioa *ioa.Ioa) {
+	configTpl := ioa.Plugins.GetPluginConfigTpl(c.Param("pluginId"))
+	c.JSON(http.StatusOK, configTpl)
 }
