@@ -2,6 +2,7 @@
 package model
 
 import (
+	"github.com/jinzhu/gorm"
 	"ioa/httpServer/app"
 )
 
@@ -42,7 +43,13 @@ func (apiGroup *ApiGroup) List(rawQuery string, rawOrder string, offset int, lim
 	apiGroups := []ApiGroup{}
 	total := 0
 
-	db := app.DB.Model(apiGroup).Preload("Apis").Preload("Apis.Targets").Preload("Apis.Params")
+	db := app.DB.Model(apiGroup).Preload("Apis",
+		func(db *gorm.DB) *gorm.DB {
+			return db.Order("api.created_at ASC")
+		}).Preload("Apis.Targets",
+		func(db *gorm.DB) *gorm.DB {
+			return db.Order("target.created_at ASC")
+		}).Preload("Apis.Params")
 
 	db, err := buildWhere(rawQuery, db)
 	if err != nil {
@@ -65,7 +72,13 @@ func (apiGroup *ApiGroup) List(rawQuery string, rawOrder string, offset int, lim
 }
 
 func (apiGroup *ApiGroup) Get() (*ApiGroup, error) {
-	err := app.DB.Find(&apiGroup).Error
+	err := app.DB.Model(apiGroup).Preload("Apis",
+		func(db *gorm.DB) *gorm.DB {
+			return db.Order("api.created_at ASC")
+		}).Preload("Apis.Targets",
+		func(db *gorm.DB) *gorm.DB {
+			return db.Order("target.created_at ASC")
+		}).Preload("Apis.Params").Find(&apiGroup).Error
 
 	return apiGroup, err
 }
