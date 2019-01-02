@@ -1,6 +1,7 @@
 all:
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa ./cli/main.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	#rm -rf plugins/*.so
 	#@for FILE in $(shell ls plugins); do \
 	#	echo "building " $$FILE ;\
