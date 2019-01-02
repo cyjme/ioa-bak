@@ -51,7 +51,9 @@ func (ioa *Ioa) StartServer() {
 	ioa.loadApiToRouter()
 
 	log.Println("load Api from database Success:", ioa.Apis)
+	//todo 获取状态为 启用 的 api 列表，进行注册
 	ioa.Plugins.Register("1", "./plugins/size.so")
+	ioa.Plugins.Register("2", "./plugins/rate.so")
 
 	http.HandleFunc("/", ioa.ReverseProxy)
 
@@ -60,7 +62,6 @@ func (ioa *Ioa) StartServer() {
 }
 
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
-	log.Println("***********************", r.URL.Scheme)
 	method := r.Method
 	path := r.URL.Path
 	apiId, params, _ := ioa.Router.FindRoute(method, path)
@@ -72,7 +73,10 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	for _, pluginId := range api.Plugins {
 		name := ioa.Plugins[pluginId].GetName()
 		log.Println("plugin will run", name)
-		ioa.Plugins[pluginId].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
+		err := ioa.Plugins[pluginId].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
+		if err != nil {
+			return
+		}
 	}
 	log.Println("receive request")
 

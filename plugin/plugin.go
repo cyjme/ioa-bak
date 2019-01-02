@@ -20,7 +20,7 @@ type ConfigTpl []Field
 type IoaPlugin interface {
 	GetName() string
 	GetConfigTemplate() ConfigTpl
-	Run(w http.ResponseWriter, r *http.Request, config map[string]interface{})
+	Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) error
 }
 
 func (p Plugin) GetPluginConfigTpl(id string) ConfigTpl {

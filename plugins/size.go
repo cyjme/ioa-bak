@@ -21,7 +21,7 @@ func (s ioaPlugin) GetConfigTemplate() plugin.ConfigTpl {
 	return configTpl
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) {
+func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) error{
 	contentLength := r.ContentLength
 	maxSize := config["maxSize"].(int64)
 
@@ -31,6 +31,8 @@ func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string
 	}
 
 	log.Println("request content length:", contentLength)
+
+	return nil
 }
 
 var IoaPlugin ioaPlugin

@@ -10,6 +10,7 @@ type Plugin struct {
 	Name     string `json:"name"`
 	Describe string `json:"describe"`
 	FilePath string `json:"file_path"`
+	Status   uint   `json:"status"`
 }
 
 func (plugin *Plugin) Insert() error {
