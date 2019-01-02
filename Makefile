@@ -1,14 +1,14 @@
 all:
-	#GOOS=linux GOARCH=amd64 go build -o ./release/ioa ./cli/main.go
-	#GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
-	rm -rf plugins/*.so
-	@for FILE in $(shell ls plugins); do \
-		echo "building " $$FILE ;\
-		echo ">>> $$(basename $$FILE .go)";\
-		BASENAME=$$(basename $$FILE .go);\
-		echo $(BASENAME);\
-		go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
-	done
+	GOOS=linux GOARCH=amd64 go build -o ./release/ioa ./cli/main.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
+	#rm -rf plugins/*.so
+	#@for FILE in $(shell ls plugins); do \
+	#	echo "building " $$FILE ;\
+	#	echo ">>> $$(basename $$FILE .go)";\
+	#	BASENAME=$$(basename $$FILE .go);\
+	#	echo $(BASENAME);\
+	#	go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
+	#done
 clean:
 	@rm -rf ./release/*
 gotool:
