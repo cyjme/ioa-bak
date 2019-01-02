@@ -1,38 +1,82 @@
 package main
 
 import (
-	"ioa/plugin"
+	"errors"
+	"ioa"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type ioaPlugin struct {
 }
 
+type Data struct {
+}
+type Config struct {
+	maxSize int64
+}
+
+var name = "request_size"
+
 func (s ioaPlugin) GetName() string {
 	return "request_size"
 }
 
-func (s ioaPlugin) GetConfigTemplate() plugin.ConfigTpl {
-	configTpl := plugin.ConfigTpl{
+func (s ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
+	configTpl := ioa.ConfigTpl{
 		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
 	}
 
 	return configTpl
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) error{
-	contentLength := r.ContentLength
-	maxSize := config["maxSize"].(int64)
+func (i ioaPlugin) InitApi(api *ioa.Api) error {
+	err := i.InitApiConfig(api)
+	if err != nil {
+		return i.throwErr(err)
+	}
+	err = i.InitApiData(api)
+	if err != nil {
+		return i.throwErr(err)
+	}
 
-	if contentLength > maxSize {
+	return nil
+}
+
+func (i ioaPlugin) InitApiData(api *ioa.Api) error {
+	return nil
+}
+
+func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
+	maxSizeStr := api.PluginRawConfig["request_size_max_size"]
+	maxSize, err := strconv.ParseInt(maxSizeStr, 10, 64)
+	if err != nil {
+		return i.throwErr(err)
+	}
+	config := Config{
+		maxSize: maxSize,
+	}
+	api.PluginConfig[name] = config
+
+	return nil
+}
+
+func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+	contentLength := r.ContentLength
+	config := api.PluginConfig[name].(Config)
+
+	if contentLength > config.maxSize {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("contentLength too large"))
 	}
-
 	log.Println("request content length:", contentLength)
 
 	return nil
+}
+
+func (i ioaPlugin) throwErr(err error) error {
+	return errors.New("plugin" + name + err.Error())
 }
 
 var IoaPlugin ioaPlugin

@@ -1,12 +1,13 @@
 package plugin
 
 import (
+	"ioa"
 	"log"
 	"net/http"
 	"plugin"
 )
 
-type Plugin map[string]IoaPlugin
+type Plugins map[string]IoaPlugin
 
 type Field struct {
 	Name      string `json:"name"`
@@ -20,17 +21,18 @@ type ConfigTpl []Field
 type IoaPlugin interface {
 	GetName() string
 	GetConfigTemplate() ConfigTpl
-	Run(w http.ResponseWriter, r *http.Request, config map[string]interface{}) error
+	InitApi(api *ioa.Api) error
+	Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error
 }
 
-func (p Plugin) GetPluginConfigTpl(id string) ConfigTpl {
+func (p Plugins) GetPluginConfigTpl(id string) ConfigTpl {
 	var configTpl ConfigTpl
 	configTpl = p[id].GetConfigTemplate()
 
 	return configTpl
 }
 
-func (p Plugin) Register(id string, path string) {
+func (p Plugins) Register(id string, path string) {
 	plugin, err := plugin.Open(path)
 
 	if err != nil {

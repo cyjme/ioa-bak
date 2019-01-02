@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"ioa/httpServer/app"
 	"ioa/httpServer/model"
-	"ioa/plugin"
 	"ioa/router"
 	"log"
 	"math/rand"
@@ -14,47 +13,39 @@ import (
 
 type Ioa struct {
 	Apis    map[string]Api
-	Plugins plugin.Plugin
+	Plugins Plugins
 	Router  router.Router
 }
 
 func New() *Ioa {
 	return &Ioa{
 		Apis:    make(map[string]Api),
-		Plugins: make(plugin.Plugin),
+		Plugins: make(Plugins),
 		Router:  router.New(),
 	}
 }
 
-type Api struct {
-	model.Common
-	ApiGroupId string `json:"apiGroupId"`
-	Name       string `json:"name"`
-	Describe   string `json:"describe"`
-	Path       string `json:"path"`
-	Method     string `json:"method"`
-	Status     string `json:"status"`
-
-	Targets       []model.Target    `json:"targets"`
-	Params        []model.Param     `json:"params"`
-	Policies      []string          `json:"policies"`
-	GroupPolicies []string          `json:"groupPolicies"`
-	Plugins       []string          `json:"plugins"`
-	GroupPlugins  []string          `json:"groupPlugins"`
-	AllPlugin     []string          `json:"allPlugin"`
-	PluginConfig  map[string]string `json:"pluginConfig"`
-}
-
 func (ioa *Ioa) StartServer() {
 	log.Println("load Api from database")
-	ioa.LoadApi()
-	ioa.loadApiToRouter()
-
-	log.Println("load Api from database Success:", ioa.Apis)
 	//todo 获取状态为 启用 的 api 列表，进行注册
-	ioa.Plugins.Register("1", "./plugins/size.so")
-	ioa.Plugins.Register("2", "./plugins/rate.so")
+	ioa.Plugins.Register("request_size", "./plugins/size.so")
+	ioa.Plugins.Register("rate_limiter", "./plugins/rate.so")
 
+	ioa.LoadApi()
+	//todo 为所有的 api 初始化插件数据
+
+	//log.Println("为所有api 初始化插件数据")
+	//for _, api := range ioa.Apis {
+	//	for _, plugin := range ioa.Plugins {
+	//		err := plugin.InitApi(&api)
+	//		if err != nil {
+	//			log.Println(err)
+	//		}
+	//	}
+	//}
+
+	ioa.loadApiToRouter()
+	log.Println("load Api from database Success:", ioa.Apis)
 	http.HandleFunc("/", ioa.ReverseProxy)
 
 	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
@@ -73,7 +64,7 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	for _, pluginId := range api.Plugins {
 		name := ioa.Plugins[pluginId].GetName()
 		log.Println("plugin will run", name)
-		err := ioa.Plugins[pluginId].Run(w, r, map[string]interface{}{"maxSize": int64(10000)})
+		err := ioa.Plugins[pluginId].Run(w, r, &api)
 		if err != nil {
 			return
 		}
@@ -156,10 +147,10 @@ func (ioa *Ioa) LoadApi() {
 			newApiAllPlugins = append(newApiAllPlugins, apiPoliciesPlugins...)
 			newApiAllPlugins = append(newApiAllPlugins, newApiPlugins...)
 
-			var newApiPluginConfig map[string]string
+			var newApiPluginRawConfig map[string]string
 			//处理 api 的 pluginConfig
 			if api.PluginConfig != "" {
-				err := json.Unmarshal([]byte(api.PluginConfig), &newApiPluginConfig)
+				err := json.Unmarshal([]byte(api.PluginConfig), &newApiPluginRawConfig)
 				if err != nil {
 					log.Println("api pluginConfig Unmarshal error")
 				}
@@ -173,14 +164,14 @@ func (ioa *Ioa) LoadApi() {
 				Method:     api.Method,
 				Status:     api.Status,
 
-				Targets:       api.Targets,
-				Params:        api.Params,
-				Policies:      newApiPolicies,
-				GroupPolicies: apiGroupPolicies,
-				GroupPlugins:  apiGroupPlugins,
-				Plugins:       newApiPlugins,
-				AllPlugin:     newApiAllPlugins,
-				PluginConfig:  newApiPluginConfig,
+				Targets:         api.Targets,
+				Params:          api.Params,
+				Policies:        newApiPolicies,
+				GroupPolicies:   apiGroupPolicies,
+				GroupPlugins:    apiGroupPlugins,
+				Plugins:         newApiPlugins,
+				AllPlugin:       newApiAllPlugins,
+				PluginRawConfig: newApiPluginRawConfig,
 			}
 
 			ioa.Apis[api.Id] = newApi

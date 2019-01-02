@@ -4,11 +4,12 @@
 
 * default plugin
 
-[] 请求大小限制
-[] global ipLimit
+[x] 请求大小限制
+[x] rate limit
 
+
+[] global ipLimit
 [] count
-[] rate limit
 [] auth
 [] 数据缓存
 [] 参数映射
