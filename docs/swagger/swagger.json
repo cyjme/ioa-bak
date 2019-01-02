@@ -923,6 +923,9 @@
                 "name": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
