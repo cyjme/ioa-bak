@@ -49,7 +49,11 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 }
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
-	maxSizeStr := api.PluginRawConfig["request_size_max_size"]
+	maxSizeStr, exist := api.PluginRawConfig["request_size_max_size"]
+	if !exist {
+		return i.throwErr(errors.New("config field doesn't exist"))
+	}
+
 	maxSize, err := strconv.ParseInt(maxSizeStr, 10, 64)
 	if err != nil {
 		return i.throwErr(err)

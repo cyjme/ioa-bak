@@ -20,5 +20,5 @@ type Api struct {
 	AllPlugin       []string               `json:"allPlugin"`
 	PluginRawConfig map[string]string      `json:"pluginRawConfig"`
 	PluginConfig    map[string]interface{} `json:"pluginConfig"`
-	PluginsData     map[string]interface{}
+	PluginsData     map[string]interface{} `json:"pluginsData"`
 }

@@ -10,6 +10,10 @@ all:
 	#	echo $(BASENAME);\
 	#	go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
 	#done
+dev:
+	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
+	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
+	go run cli/main.go
 clean:
 	@rm -rf ./release/*
 gotool:

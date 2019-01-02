@@ -75,9 +75,15 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 }
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
-	limitString := api.PluginRawConfig["rate_limit_limit"]
-	burstString := api.PluginRawConfig["rate_limit_burst"]
+	limitString, exist := api.PluginRawConfig["rate_limit_limit"]
+	if !exist {
+		return i.throwErr(errors.New("config field doesn't exist"))
+	}
+	burstString, exist := api.PluginRawConfig["rate_limit_burst"]
 
+	if !exist {
+		return i.throwErr(errors.New("config field doesn't exist"))
+	}
 	burst, err := strconv.Atoi(burstString)
 	if err != nil {
 		return i.throwErr(err)

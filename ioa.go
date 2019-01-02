@@ -29,20 +29,20 @@ func (ioa *Ioa) StartServer() {
 	log.Println("load Api from database")
 	//todo 获取状态为 启用 的 api 列表，进行注册
 	ioa.Plugins.Register("request_size", "./plugins/size.so")
-	ioa.Plugins.Register("rate_limiter", "./plugins/rate.so")
+	ioa.Plugins.Register("rate_limit", "./plugins/rate.so")
 
 	ioa.LoadApi()
 	//todo 为所有的 api 初始化插件数据
 
 	//log.Println("为所有api 初始化插件数据")
-	//for _, api := range ioa.Apis {
-	//	for _, plugin := range ioa.Plugins {
-	//		err := plugin.InitApi(&api)
-	//		if err != nil {
-	//			log.Println(err)
-	//		}
-	//	}
-	//}
+	for _, api := range ioa.Apis {
+		for _, plugin := range ioa.Plugins {
+			err := plugin.InitApi(&api)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
 
 	ioa.loadApiToRouter()
 	log.Println("load Api from database Success:", ioa.Apis)
@@ -62,9 +62,15 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	api := ioa.Apis[apiId]
 
 	for _, pluginId := range api.Plugins {
-		name := ioa.Plugins[pluginId].GetName()
+		plugin, exist := ioa.Plugins[pluginId]
+		if !exist {
+			w.Write([]byte("the api use unexist plugin:" + pluginId))
+			return
+		}
+
+		name := plugin.GetName()
 		log.Println("plugin will run", name)
-		err := ioa.Plugins[pluginId].Run(w, r, &api)
+		err := plugin.Run(w, r, &api)
 		if err != nil {
 			return
 		}
@@ -172,6 +178,8 @@ func (ioa *Ioa) LoadApi() {
 				Plugins:         newApiPlugins,
 				AllPlugin:       newApiAllPlugins,
 				PluginRawConfig: newApiPluginRawConfig,
+				PluginConfig:    make(map[string]interface{}),
+				PluginsData:     make(map[string]interface{}),
 			}
 
 			ioa.Apis[api.Id] = newApi
