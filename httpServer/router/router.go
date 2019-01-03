@@ -76,6 +76,28 @@ func Start(ioa *ioa.Ioa) {
 		policyGroup.PATCH("/:policyId", policyController.Patch)
 	}
 
+	paramController := controller.ParamController{}
+	paramGroup := r.Group("/params")
+	{
+		paramGroup.GET("", paramController.List)
+		paramGroup.POST("", paramController.Create)
+		paramGroup.DELETE("/:paramId", paramController.Delete)
+		paramGroup.PUT("/:paramId", paramController.Put)
+		paramGroup.GET("/:paramId", paramController.Get)
+		paramGroup.PATCH("/:paramId", paramController.Patch)
+	}
+
+	targetController := controller.TargetController{}
+	targetGroup := r.Group("/targets")
+	{
+		targetGroup.GET("", targetController.List)
+		targetGroup.POST("", targetController.Create)
+		targetGroup.DELETE("/:targetId", targetController.Delete)
+		targetGroup.PUT("/:targetId", targetController.Put)
+		targetGroup.GET("/:targetId", targetController.Get)
+		targetGroup.PATCH("/:targetId", targetController.Patch)
+	}
+
 	//!!do not delete gen will generate router code at here
 
 	addr := app.Config.Http.Host + ":" + app.Config.Http.Port
