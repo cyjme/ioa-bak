@@ -3,7 +3,6 @@ package pkg
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"log"
 	"net/http"
 )
 
@@ -14,8 +13,6 @@ func ParseRequest(c *gin.Context, request interface{}) error {
 			"msg":   "parse Request Error",
 			"error": err.Error(),
 		})
-		log.Println("ParseRequest Result", request)
-		log.Println("ParseRequest Error", err.Error())
 		return err
 	}
 	return nil

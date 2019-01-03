@@ -26,7 +26,6 @@ func New() *Ioa {
 }
 
 func (ioa *Ioa) StartServer() {
-	log.Println("load Api from database")
 	//todo 获取状态为 启用 的 api 列表，进行注册
 	ioa.Plugins.Register("request_size", "./plugins/size.so")
 	ioa.Plugins.Register("rate_limit", "./plugins/rate.so")
@@ -45,7 +44,6 @@ func (ioa *Ioa) StartServer() {
 	}
 
 	ioa.loadApiToRouter()
-	log.Println("load Api from database Success:", ioa.Apis)
 	http.HandleFunc("/", ioa.ReverseProxy)
 
 	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
