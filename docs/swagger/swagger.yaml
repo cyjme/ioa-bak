@@ -1,4 +1,15 @@
 definitions:
+  ioa.Field:
+    properties:
+      desc:
+        type: string
+      fieldType:
+        type: string
+      name:
+        type: string
+      required:
+        type: boolean
+    type: object
   model.Api:
     properties:
       apiGroupId:
@@ -138,17 +149,6 @@ definitions:
         type: string
       updatedAt:
         type: string
-    type: object
-  plugin.Field:
-    properties:
-      desc:
-        type: string
-      fieldType:
-        type: string
-      name:
-        type: string
-      required:
-        type: boolean
     type: object
 info:
   contact: {}
@@ -398,6 +398,128 @@ paths:
       summary: Put
       tags:
       - Api
+  /params:
+    get:
+      parameters:
+      - description: query, ?query=age:>:21,name:like:%jason%
+        in: query
+        name: query
+        type: string
+      - description: order, ?order=age:desc,created_at:asc
+        in: query
+        name: order
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: param array
+          schema:
+            items:
+              $ref: '#/definitions/model.Param'
+            type: array
+      summary: List
+      tags:
+      - Param
+    post:
+      parameters:
+      - description: Param
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Param'
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Create
+      tags:
+      - Param
+  /params/{paramId}:
+    delete:
+      parameters:
+      - description: paramId
+        in: path
+        name: paramId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete
+      tags:
+      - Param
+    get:
+      parameters:
+      - description: paramId
+        in: path
+        name: paramId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: param object
+          schema:
+            $ref: '#/definitions/model.Param'
+            type: object
+      summary: Get
+      tags:
+      - Param
+    patch:
+      parameters:
+      - description: param
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Param'
+          type: object
+      - description: paramId
+        in: path
+        name: paramId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Patch
+      tags:
+      - Param
+    put:
+      parameters:
+      - description: param
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Param'
+          type: object
+      - description: paramId
+        in: path
+        name: paramId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Put
+      tags:
+      - Param
   /plugins:
     get:
       parameters:
@@ -533,7 +655,7 @@ paths:
           description: plugin ConfigTpl
           schema:
             items:
-              $ref: '#/definitions/plugin.Field'
+              $ref: '#/definitions/ioa.Field'
             type: array
       summary: Get
       tags:
@@ -660,4 +782,126 @@ paths:
       summary: Put
       tags:
       - Policy
+  /targets:
+    get:
+      parameters:
+      - description: query, ?query=age:>:21,name:like:%jason%
+        in: query
+        name: query
+        type: string
+      - description: order, ?order=age:desc,created_at:asc
+        in: query
+        name: order
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: target array
+          schema:
+            items:
+              $ref: '#/definitions/model.Target'
+            type: array
+      summary: List
+      tags:
+      - Target
+    post:
+      parameters:
+      - description: Target
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Target'
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Create
+      tags:
+      - Target
+  /targets/{targetId}:
+    delete:
+      parameters:
+      - description: targetId
+        in: path
+        name: targetId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete
+      tags:
+      - Target
+    get:
+      parameters:
+      - description: targetId
+        in: path
+        name: targetId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: target object
+          schema:
+            $ref: '#/definitions/model.Target'
+            type: object
+      summary: Get
+      tags:
+      - Target
+    patch:
+      parameters:
+      - description: target
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Target'
+          type: object
+      - description: targetId
+        in: path
+        name: targetId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Patch
+      tags:
+      - Target
+    put:
+      parameters:
+      - description: target
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Target'
+          type: object
+      - description: targetId
+        in: path
+        name: targetId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Put
+      tags:
+      - Target
 swagger: "2.0"

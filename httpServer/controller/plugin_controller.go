@@ -158,7 +158,7 @@ func (ctl *PluginController) Get(c *gin.Context) {
 // @Summary Get
 // @Tags    Plugin
 // @Param  pluginId path string true "pluginId"
-// @Success 200 {array} plugin.Field "plugin ConfigTpl"
+// @Success 200 {array} ioa.Field "plugin ConfigTpl"
 // @Router /plugins/{pluginId}/configTpl [get]
 func (ctl *PluginController) GetPluginConfigTpl(c *gin.Context,ioa *ioa.Ioa) {
 	configTpl := ioa.Plugins.GetPluginConfigTpl(c.Param("pluginId"))
