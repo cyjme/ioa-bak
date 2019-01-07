@@ -19,9 +19,16 @@ type ConfigTpl []Field
 
 type IoaPlugin interface {
 	GetName() string
+	GetDescribe() string
 	GetConfigTemplate() ConfigTpl
 	InitApi(api *Api) error
 	Run(w http.ResponseWriter, r *http.Request, api *Api) error
+}
+
+type Plugin struct {
+	Name      string    `json:"name"`
+	Describe  string    `json:"describe"`
+	ConfigTpl ConfigTpl `json:"configTpl"`
 }
 
 func (p Plugins) GetPluginConfigTpl(id string) ConfigTpl {

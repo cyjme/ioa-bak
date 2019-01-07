@@ -91,25 +91,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  model.Plugin:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      describe:
-        type: string
-      file_path:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      status:
-        type: integer
-      updatedAt:
-        type: string
-    type: object
   model.Policy:
     properties:
       createdAt:
@@ -522,132 +503,15 @@ paths:
       - Param
   /plugins:
     get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
-      responses:
-        "200":
-          description: plugin array
-          schema:
-            items:
-              $ref: '#/definitions/model.Plugin'
-            type: array
       summary: List
       tags:
       - Plugin
-    post:
-      parameters:
-      - description: Plugin
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Plugin'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Create
-      tags:
-      - Plugin
-  /plugins/{pluginId}:
-    delete:
-      parameters:
-      - description: pluginId
-        in: path
-        name: pluginId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete
-      tags:
-      - Plugin
+  /plugins/{pluginName}:
     get:
       parameters:
-      - description: pluginId
+      - description: pluginName
         in: path
-        name: pluginId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: plugin object
-          schema:
-            $ref: '#/definitions/model.Plugin'
-            type: object
-      summary: Get
-      tags:
-      - Plugin
-    patch:
-      parameters:
-      - description: plugin
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Plugin'
-          type: object
-      - description: pluginId
-        in: path
-        name: pluginId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
-      tags:
-      - Plugin
-    put:
-      parameters:
-      - description: plugin
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Plugin'
-          type: object
-      - description: pluginId
-        in: path
-        name: pluginId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Put
-      tags:
-      - Plugin
-  /plugins/{pluginId}/configTpl:
-    get:
-      parameters:
-      - description: pluginId
-        in: path
-        name: pluginId
+        name: pluginName
         required: true
         type: string
       responses:
@@ -657,7 +521,7 @@ paths:
             items:
               $ref: '#/definitions/ioa.Field'
             type: array
-      summary: Get
+      summary: GetPluginConfigTpl
       tags:
       - Plugin
   /policys:

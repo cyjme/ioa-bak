@@ -24,8 +24,28 @@ func Start(ioa *ioa.Ioa) {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
-	r.GET("/pinga", func(context *gin.Context) {
-		context.Writer.Write([]byte("pong"))
+	r.GET("/test/users", func(context *gin.Context) {
+		type user struct {
+			Name  string `json:"name"`
+			Phone string `json:"phone"`
+			Email string `json:"email"`
+		}
+		data := []user{
+			user{
+				Name:  "jason",
+				Phone: "13061710381",
+				Email: "changyuanjian@gmail.com",
+			},
+			user{
+				Name:  "wwq",
+				Phone: "13023221023",
+				Email: "wwq@kuipgroup.com",
+			},
+		}
+		context.JSON(200, data)
+	})
+	r.POST("/test/users", func(context *gin.Context) {
+		context.JSON(200, nil)
 	})
 
 	apiController := controller.ApiController{}
@@ -53,15 +73,12 @@ func Start(ioa *ioa.Ioa) {
 	pluginController := controller.PluginController{}
 	pluginGroup := r.Group("/plugins")
 	{
-		pluginGroup.GET("", pluginController.List)
-		pluginGroup.POST("", pluginController.Create)
-		pluginGroup.DELETE("/:pluginId", pluginController.Delete)
-		pluginGroup.PUT("/:pluginId", pluginController.Put)
-		pluginGroup.GET("/:pluginId", pluginController.Get)
-		pluginGroup.PATCH("/:pluginId", pluginController.Patch)
+		pluginGroup.GET("", func(c *gin.Context) {
+			pluginController.List(c, ioa)
+		})
 
-		pluginGroup.GET("/:pluginId/configTpl", func(c *gin.Context) {
-			pluginController.GetPluginConfigTpl(c, ioa)
+		pluginGroup.GET("/:pluginName", func(c *gin.Context) {
+			pluginController.Get(c, ioa)
 		})
 	}
 

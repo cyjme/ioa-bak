@@ -27,9 +27,14 @@ func (i ioaPlugin) GetName() string {
 	return name
 }
 
+func (s ioaPlugin) GetDescribe() string {
+	return `rate_limit describe`
+}
+
 func (i ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
 	configTpl := ioa.ConfigTpl{
 		{Name: "Limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
+		{Name: "Burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
 	}
 
 	return configTpl

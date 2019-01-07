@@ -3,7 +3,9 @@ module ioa
 require (
 	cloud.google.com/go v0.34.0 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/cosiner/argv v0.0.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f // indirect
+	github.com/derekparker/delve v1.1.0 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
 	github.com/gin-gonic/gin v1.3.0
@@ -22,11 +24,15 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
+	github.com/sirupsen/logrus v1.3.0 // indirect
+	github.com/spf13/cobra v0.0.3 // indirect
 	github.com/spf13/viper v1.3.1
 	github.com/swaggo/gin-swagger v1.0.0
 	github.com/swaggo/swag v1.4.0
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
+	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/net v0.0.0-20181207154023-610586996380 // indirect
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f // indirect
 	golang.org/x/sys v0.0.0-20181212120007-b05ddf57801d // indirect

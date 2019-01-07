@@ -23,6 +23,10 @@ func (s ioaPlugin) GetName() string {
 	return "request_size"
 }
 
+func (s ioaPlugin) GetDescribe() string {
+	return "request_size just get a request content-length"
+}
+
 func (s ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
 	configTpl := ioa.ConfigTpl{
 		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},

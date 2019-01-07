@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httputil"
+	"strings"
 )
 
 type Ioa struct {
@@ -27,16 +28,18 @@ func New() *Ioa {
 
 func (ioa *Ioa) StartServer() {
 	//todo 获取状态为 启用 的 api 列表，进行注册
-	ioa.Plugins.Register("request_size", "./plugins/size.so")
-	ioa.Plugins.Register("rate_limit", "./plugins/rate.so")
+	for _, plugin := range app.Config.Plugins {
+		ioa.Plugins.Register(plugin.Name, plugin.Path)
+	}
 
 	ioa.LoadApi()
 	//todo 为所有的 api 初始化插件数据
 
 	//log.Println("为所有api 初始化插件数据")
 	for _, api := range ioa.Apis {
-		for _, plugin := range ioa.Plugins {
-			err := plugin.InitApi(&api)
+		for _, plugin := range api.Plugins {
+			log.Println("plugin range...........", plugin)
+			err := ioa.Plugins[plugin].InitApi(&api)
 			if err != nil {
 				log.Println(err)
 			}
@@ -47,7 +50,10 @@ func (ioa *Ioa) StartServer() {
 	http.HandleFunc("/", ioa.ReverseProxy)
 
 	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
-	http.ListenAndServe(addr, nil)
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
@@ -96,9 +102,8 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ioa *Ioa) loadApiToRouter() {
-	log.Println("apissssss", ioa.Apis)
 	for id, api := range ioa.Apis {
-		ioa.Router.AddRoute(api.Method, api.Path, id)
+		ioa.Router.AddRoute(strings.ToUpper(api.Method), api.Path, id)
 	}
 }
 

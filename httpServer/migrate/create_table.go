@@ -12,7 +12,6 @@ func CreateTable() {
 		&model.Param{},
 		&model.Policy{},
 		&model.Target{},
-		&model.Plugin{},
 		//!!do not delete the line, gen generate code at here
 
 	)

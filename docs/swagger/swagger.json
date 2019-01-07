@@ -568,198 +568,20 @@
                 "tags": [
                     "Plugin"
                 ],
-                "summary": "List",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "query, ?query=age:\u003e:21,name:like:%jason%",
-                        "name": "query",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order, ?order=age:desc,created_at:asc",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "pageSize",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "plugin array",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Plugin"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Plugin"
-                ],
-                "summary": "Create",
-                "parameters": [
-                    {
-                        "description": "Plugin",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/model.Plugin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
+                "summary": "List"
             }
         },
-        "/plugins/{pluginId}": {
+        "/plugins/{pluginName}": {
             "get": {
                 "tags": [
                     "Plugin"
                 ],
-                "summary": "Get",
+                "summary": "GetPluginConfigTpl",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "pluginId",
-                        "name": "pluginId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "plugin object",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/model.Plugin"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Plugin"
-                ],
-                "summary": "Put",
-                "parameters": [
-                    {
-                        "description": "plugin",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/model.Plugin"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "pluginId",
-                        "name": "pluginId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Plugin"
-                ],
-                "summary": "Delete",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "pluginId",
-                        "name": "pluginId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "tags": [
-                    "Plugin"
-                ],
-                "summary": "Patch",
-                "parameters": [
-                    {
-                        "description": "plugin",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/model.Plugin"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "pluginId",
-                        "name": "pluginId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/{pluginId}/configTpl": {
-            "get": {
-                "tags": [
-                    "Plugin"
-                ],
-                "summary": "Get",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "pluginId",
-                        "name": "pluginId",
+                        "description": "pluginName",
+                        "name": "pluginName",
                         "in": "path",
                         "required": true
                     }
@@ -1285,35 +1107,6 @@
                 },
                 "targetName": {
                     "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Plugin": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "describe": {
-                    "type": "string"
-                },
-                "file_path": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
                 },
                 "updatedAt": {
                     "type": "string"
