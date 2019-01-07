@@ -9,6 +9,7 @@ import (
 )
 
 type ioaPlugin struct {
+	BasePlugin
 }
 
 type Data struct {
