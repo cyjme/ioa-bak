@@ -29,7 +29,7 @@ func (ctl *PluginController) List(c *gin.Context, i *ioa.Ioa) {
 	})
 }
 
-// @Summary GetPluginConfigTpl
+// @Summary GetPluginConfigDetail
 // @Tags    Plugin
 // @Param  pluginName path string true "pluginName"
 // @Success 200 {array} ioa.Field "plugin ConfigTpl"
