@@ -7,7 +7,6 @@ import (
 	"ioa/httpServer/app"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type ioaPlugin struct {
@@ -80,30 +79,30 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 }
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
-	limitString, exist := api.PluginRawConfig["rate_limit_limit"]
-	if !exist {
-		return i.throwErr(errors.New("config field doesn't exist"))
-	}
-	burstString, exist := api.PluginRawConfig["rate_limit_burst"]
-
-	if !exist {
-		return i.throwErr(errors.New("config field doesn't exist"))
-	}
-	burst, err := strconv.Atoi(burstString)
-	if err != nil {
-		return i.throwErr(err)
-	}
-
-	limit, err := strconv.Atoi(limitString)
-	if err != nil {
-		return i.throwErr(err)
-	}
-
-	config := Config{
-		limit: rate.Limit(limit),
-		burst: burst,
-	}
-	api.PluginConfig[name] = config
+	//limitString, exist := api.PluginRawConfig["rate_limit_limit"]
+	//if !exist {
+	//	return i.throwErr(errors.New("config field doesn't exist"))
+	//}
+	//burstString, exist := api.PluginRawConfig["rate_limit_burst"]
+	//
+	//if !exist {
+	//	return i.throwErr(errors.New("config field doesn't exist"))
+	//}
+	//burst, err := strconv.Atoi(burstString)
+	//if err != nil {
+	//	return i.throwErr(err)
+	//}
+	//
+	//limit, err := strconv.Atoi(limitString)
+	//if err != nil {
+	//	return i.throwErr(err)
+	//}
+	//
+	//config := Config{
+	//	limit: rate.Limit(limit),
+	//	burst: burst,
+	//}
+	//api.PluginConfig[name] = config
 
 	return nil
 }

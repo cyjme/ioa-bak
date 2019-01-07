@@ -38,6 +38,7 @@ func (ioa *Ioa) StartServer() {
 	//log.Println("为所有api 初始化插件数据")
 	for _, api := range ioa.Apis {
 		for _, plugin := range api.Plugins {
+			log.Println("this api's plugins", api.Plugins)
 			log.Println("plugin range...........", plugin)
 			err := ioa.Plugins[plugin].InitApi(&api)
 			if err != nil {
@@ -60,15 +61,15 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	path := r.URL.Path
 	apiId, params, _ := ioa.Router.FindRoute(method, path)
-	log.Println("api id is :", apiId)
+	log.Println("api id is ..... :", apiId)
 	log.Println("api params is :", params)
 	//todo match api, get model.Api
 	api := ioa.Apis[apiId]
 
-	for _, pluginId := range api.Plugins {
-		plugin, exist := ioa.Plugins[pluginId]
+	for _, plugin := range api.Plugins {
+		plugin, exist := ioa.Plugins[plugin]
 		if !exist {
-			w.Write([]byte("the api use unexist plugin:" + pluginId))
+			w.Write([]byte("the api use unexist plugin:" + plugin.GetName()))
 			return
 		}
 
@@ -137,8 +138,19 @@ func (ioa *Ioa) LoadApi() {
 		for _, api := range group.Apis {
 			var newApiPolicies []string
 			var newApiPlugins []string
+			newApiPluginsConfig := make(map[string]json.RawMessage)
+			type rawPlugin struct {
+				Name   string
+				Config json.RawMessage
+			}
+			var newRawPlugins []rawPlugin
 			json.Unmarshal([]byte(api.Policies), &newApiPolicies)
-			json.Unmarshal([]byte(api.Plugins), &newApiPlugins)
+			json.Unmarshal([]byte(api.Plugins), &newRawPlugins)
+
+			for _, rawPlugin := range newRawPlugins {
+				newApiPlugins = append(newApiPlugins, rawPlugin.Name)
+				newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
+			}
 
 			//api policy plugins
 			var apiPoliciesPlugins []string
@@ -156,15 +168,6 @@ func (ioa *Ioa) LoadApi() {
 			newApiAllPlugins = append(newApiAllPlugins, apiPoliciesPlugins...)
 			newApiAllPlugins = append(newApiAllPlugins, newApiPlugins...)
 
-			var newApiPluginRawConfig map[string]string
-			//处理 api 的 pluginConfig
-			if api.PluginConfig != "" {
-				err := json.Unmarshal([]byte(api.PluginConfig), &newApiPluginRawConfig)
-				if err != nil {
-					log.Println("api pluginConfig Unmarshal error")
-				}
-			}
-
 			newApi := Api{
 				ApiGroupId: api.ApiGroupId,
 				Name:       api.Name,
@@ -180,7 +183,7 @@ func (ioa *Ioa) LoadApi() {
 				GroupPlugins:    apiGroupPlugins,
 				Plugins:         newApiPlugins,
 				AllPlugin:       newApiAllPlugins,
-				PluginRawConfig: newApiPluginRawConfig,
+				PluginRawConfig: newApiPluginsConfig,
 				PluginConfig:    make(map[string]interface{}),
 				PluginsData:     make(map[string]interface{}),
 			}

@@ -3,7 +3,7 @@ package ioa
 import (
 	"log"
 	"net/http"
-	"plugin"
+	goPlugin "plugin"
 )
 
 type Plugins map[string]IoaPlugin
@@ -39,7 +39,7 @@ func (p Plugins) GetPluginConfigTpl(id string) ConfigTpl {
 }
 
 func (p Plugins) Register(id string, path string) {
-	plugin, err := plugin.Open(path)
+	plugin, err := goPlugin.Open(path)
 
 	if err != nil {
 		log.Println(err.Error())

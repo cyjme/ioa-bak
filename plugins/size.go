@@ -1,21 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"ioa"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type ioaPlugin struct {
-	BasePlugin
 }
 
 type Data struct {
 }
 type Config struct {
 	maxSize int64
+}
+
+func (c *Config) UnmarshalJSON(b []byte) error {
+	c.maxSize = 122222
+	return nil
 }
 
 var name = "request_size"
@@ -54,18 +58,10 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 }
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
-	maxSizeStr, exist := api.PluginRawConfig["request_size_max_size"]
-	if !exist {
-		return i.throwErr(errors.New("config field doesn't exist"))
-	}
+	var config Config
+	json.Unmarshal(api.PluginRawConfig[name], &config)
+	log.Println("this is config***********", config)
 
-	maxSize, err := strconv.ParseInt(maxSizeStr, 10, 64)
-	if err != nil {
-		return i.throwErr(err)
-	}
-	config := Config{
-		maxSize: maxSize,
-	}
 	api.PluginConfig[name] = config
 
 	return nil
