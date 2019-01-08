@@ -6,6 +6,7 @@ import (
 	"ioa"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type ioaPlugin struct {
@@ -14,11 +15,26 @@ type ioaPlugin struct {
 type Data struct {
 }
 type Config struct {
-	maxSize int64
+	MaxSize int64 `json:"maxSize"`
+}
+
+type RawConfig struct {
+	MaxSize string `json:"maxSize"`
 }
 
 func (c *Config) UnmarshalJSON(b []byte) error {
-	c.maxSize = 122222
+	rawConfig := RawConfig{}
+	err := json.Unmarshal(b, &rawConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	maxSize, err := strconv.ParseInt(rawConfig.MaxSize, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	c.MaxSize = maxSize
 	return nil
 }
 
@@ -71,9 +87,10 @@ func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) err
 	contentLength := r.ContentLength
 	config := api.PluginConfig[name].(Config)
 
-	if contentLength > config.maxSize {
-		w.WriteHeader(http.StatusOK)
+	if contentLength > config.MaxSize {
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("contentLength too large"))
+		return errors.New("contentLength too large")
 	}
 	log.Println("request content length:", contentLength)
 
