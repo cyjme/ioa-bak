@@ -13,7 +13,7 @@ type ApiController struct {
 
 // @Summary Create
 // @Tags    Api
-// @Param body body model.Api true "Api"
+// @Param body body store.Api true "Api"
 // @Success 200 {string} json ""
 // @Router /apis [post]
 func (ctl *ApiController) Create(c *gin.Context) {
@@ -51,7 +51,7 @@ func (ctl *ApiController) Delete(c *gin.Context) {
 
 // @Summary Put
 // @Tags    Api
-// @Param body body model.Api true "api"
+// @Param body body store.Api true "api"
 // @Param  apiId path string true "apiId"
 // @Success 200 {string} json ""
 // @Router /apis/{apiId} [put]
@@ -78,7 +78,7 @@ func (ctl *ApiController) Put(c *gin.Context) {
 // @Param order query string false "order, ?order=age:desc,created_at:asc"
 // @Param page query int false "page"
 // @Param pageSize query int false "pageSize"
-// @Success 200 {array} model.Api "api array"
+// @Success 200 {array} store.Api "api array"
 // @Router /apis [get]
 func (ctl *ApiController) List(c *gin.Context) {
 	api := &store.Api{}
@@ -100,7 +100,7 @@ func (ctl *ApiController) List(c *gin.Context) {
 // @Summary Get
 // @Tags    Api
 // @Param  apiId path string true "apiId"
-// @Success 200 {object} model.Api "api object"
+// @Success 200 {object} store.Api "api object"
 // @Router /apis/{apiId} [get]
 func (ctl *ApiController) Get(c *gin.Context) {
 	api := &store.Api{}

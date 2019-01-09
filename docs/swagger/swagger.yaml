@@ -1,22 +1,7 @@
 definitions:
-  ioa.Field:
-    properties:
-      desc:
-        type: string
-      fieldType:
-        type: string
-      name:
-        type: string
-      required:
-        type: boolean
-    type: object
-  model.Api:
+  store.Api:
     properties:
       apiGroupId:
-        type: string
-      createdAt:
-        type: string
-      deletedAt:
         type: string
       describe:
         type: string
@@ -26,99 +11,20 @@ definitions:
         type: string
       name:
         type: string
-      params:
-        items:
-          $ref: '#/definitions/model.Param'
-        type: array
       path:
         type: string
-      pluginConfig:
-        type: string
       plugins:
-        type: string
-      policies:
         type: string
       status:
         type: string
       targets:
         items:
-          $ref: '#/definitions/model.Target'
+          $ref: '#/definitions/store.Target'
         type: array
-      updatedAt:
-        type: string
     type: object
-  model.ApiGroup:
+  store.Target:
     properties:
-      apis:
-        items:
-          $ref: '#/definitions/model.Api'
-        type: array
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      describe:
-        type: string
-      id:
-        type: string
-      isDefault:
-        type: boolean
-      name:
-        type: string
-      plugins:
-        type: string
-      policies:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  model.Param:
-    properties:
-      apiId:
-        type: string
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      id:
-        type: string
-      location:
-        type: string
-      name:
-        type: string
-      targetName:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  model.Policy:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      desc:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      plugins:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  model.Target:
-    properties:
-      apiId:
-        type: string
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
       host:
-        type: string
-      id:
         type: string
       method:
         type: string
@@ -128,135 +34,11 @@ definitions:
         type: string
       scheme:
         type: string
-      updatedAt:
-        type: string
     type: object
 info:
   contact: {}
   license: {}
 paths:
-  /apiGroups:
-    get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
-      responses:
-        "200":
-          description: apiGroup array
-          schema:
-            items:
-              $ref: '#/definitions/model.ApiGroup'
-            type: array
-      summary: List
-      tags:
-      - ApiGroup
-    post:
-      parameters:
-      - description: ApiGroup
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.ApiGroup'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Create
-      tags:
-      - ApiGroup
-  /apiGroups/{apiGroupId}:
-    delete:
-      parameters:
-      - description: apiGroupId
-        in: path
-        name: apiGroupId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete
-      tags:
-      - ApiGroup
-    get:
-      parameters:
-      - description: apiGroupId
-        in: path
-        name: apiGroupId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: apiGroup object
-          schema:
-            $ref: '#/definitions/model.ApiGroup'
-            type: object
-      summary: Get
-      tags:
-      - ApiGroup
-    patch:
-      parameters:
-      - description: apiGroup
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.ApiGroup'
-          type: object
-      - description: apiGroupId
-        in: path
-        name: apiGroupId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
-      tags:
-      - ApiGroup
-    put:
-      parameters:
-      - description: apiGroup
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.ApiGroup'
-          type: object
-      - description: apiGroupId
-        in: path
-        name: apiGroupId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Put
-      tags:
-      - ApiGroup
   /apis:
     get:
       parameters:
@@ -281,7 +63,7 @@ paths:
           description: api array
           schema:
             items:
-              $ref: '#/definitions/model.Api'
+              $ref: '#/definitions/store.Api'
             type: array
       summary: List
       tags:
@@ -293,7 +75,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/model.Api'
+          $ref: '#/definitions/store.Api'
           type: object
       responses:
         "200":
@@ -330,31 +112,9 @@ paths:
         "200":
           description: api object
           schema:
-            $ref: '#/definitions/model.Api'
+            $ref: '#/definitions/store.Api'
             type: object
       summary: Get
-      tags:
-      - Api
-    patch:
-      parameters:
-      - description: api
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Api'
-          type: object
-      - description: apiId
-        in: path
-        name: apiId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
       tags:
       - Api
     put:
@@ -364,7 +124,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/model.Api'
+          $ref: '#/definitions/store.Api'
           type: object
       - description: apiId
         in: path
@@ -379,393 +139,9 @@ paths:
       summary: Put
       tags:
       - Api
-  /params:
-    get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
-      responses:
-        "200":
-          description: param array
-          schema:
-            items:
-              $ref: '#/definitions/model.Param'
-            type: array
-      summary: List
-      tags:
-      - Param
-    post:
-      parameters:
-      - description: Param
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Param'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Create
-      tags:
-      - Param
-  /params/{paramId}:
-    delete:
-      parameters:
-      - description: paramId
-        in: path
-        name: paramId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete
-      tags:
-      - Param
-    get:
-      parameters:
-      - description: paramId
-        in: path
-        name: paramId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: param object
-          schema:
-            $ref: '#/definitions/model.Param'
-            type: object
-      summary: Get
-      tags:
-      - Param
-    patch:
-      parameters:
-      - description: param
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Param'
-          type: object
-      - description: paramId
-        in: path
-        name: paramId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
-      tags:
-      - Param
-    put:
-      parameters:
-      - description: param
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Param'
-          type: object
-      - description: paramId
-        in: path
-        name: paramId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Put
-      tags:
-      - Param
   /plugins:
     get:
-      summary: List
-      tags:
-      - Plugin
-  /plugins/{pluginName}:
-    get:
-      parameters:
-      - description: pluginName
-        in: path
-        name: pluginName
-        required: true
-        type: string
-      responses:
-        "200":
-          description: plugin ConfigTpl
-          schema:
-            items:
-              $ref: '#/definitions/ioa.Field'
-            type: array
-      summary: GetPluginConfigTpl
-      tags:
-      - Plugin
-  /policys:
-    get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
-      responses:
-        "200":
-          description: policy array
-          schema:
-            items:
-              $ref: '#/definitions/model.Policy'
-            type: array
-      summary: List
-      tags:
-      - Policy
-    post:
-      parameters:
-      - description: Policy
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Policy'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Create
-      tags:
-      - Policy
-  /policys/{policyId}:
-    delete:
-      parameters:
-      - description: policyId
-        in: path
-        name: policyId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete
-      tags:
-      - Policy
-    get:
-      parameters:
-      - description: policyId
-        in: path
-        name: policyId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: policy object
-          schema:
-            $ref: '#/definitions/model.Policy'
-            type: object
       summary: Get
       tags:
-      - Policy
-    patch:
-      parameters:
-      - description: policy
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Policy'
-          type: object
-      - description: policyId
-        in: path
-        name: policyId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
-      tags:
-      - Policy
-    put:
-      parameters:
-      - description: policy
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Policy'
-          type: object
-      - description: policyId
-        in: path
-        name: policyId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Put
-      tags:
-      - Policy
-  /targets:
-    get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
-      responses:
-        "200":
-          description: target array
-          schema:
-            items:
-              $ref: '#/definitions/model.Target'
-            type: array
-      summary: List
-      tags:
-      - Target
-    post:
-      parameters:
-      - description: Target
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Target'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Create
-      tags:
-      - Target
-  /targets/{targetId}:
-    delete:
-      parameters:
-      - description: targetId
-        in: path
-        name: targetId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete
-      tags:
-      - Target
-    get:
-      parameters:
-      - description: targetId
-        in: path
-        name: targetId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: target object
-          schema:
-            $ref: '#/definitions/model.Target'
-            type: object
-      summary: Get
-      tags:
-      - Target
-    patch:
-      parameters:
-      - description: target
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Target'
-          type: object
-      - description: targetId
-        in: path
-        name: targetId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Patch
-      tags:
-      - Target
-    put:
-      parameters:
-      - description: target
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/model.Target'
-          type: object
-      - description: targetId
-        in: path
-        name: targetId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Put
-      tags:
-      - Target
+      - Plugin
 swagger: "2.0"

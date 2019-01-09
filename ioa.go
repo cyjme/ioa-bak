@@ -99,7 +99,7 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("api id is ..... :", apiId)
 	log.Println("api params is :", params)
-	//todo match api, get model.Api
+	//todo match api, get store.Api
 	api := ioa.Apis[apiId]
 
 	for _, plugin := range api.Plugins {

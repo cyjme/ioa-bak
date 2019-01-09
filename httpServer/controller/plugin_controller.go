@@ -9,6 +9,9 @@ import (
 type PluginController struct {
 }
 
+// @Summary Get
+// @Tags   Plugin
+// @Router /plugins [get]
 func (p *PluginController) List(c *gin.Context)  {
 	plugins, total, err := store.ListPlugin()
 	if err != nil {
