@@ -9,7 +9,7 @@
 
 
 todo 
-[] 重命名 ioa.ConfigTpl
+[] 重命名 proto.ConfigTpl
 [] 检查所有 log error，log 都在顶层 ioa 包中处理写入
 [] 提供一个刷新所有 api 的接口
 

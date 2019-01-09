@@ -3,8 +3,9 @@ package ioa
 import (
 	"encoding/json"
 	"ioa/httpServer/app"
-	"ioa/httpServer/model"
+	"ioa/proto"
 	"ioa/router"
+	"ioa/store"
 	"log"
 	"math/rand"
 	"net/http"
@@ -27,28 +28,9 @@ func New() *Ioa {
 }
 
 func (ioa *Ioa) StartServer() {
-	//todo 获取状态为 启用 的 api 列表，进行注册
-	for _, plugin := range app.Config.Plugins {
-		ioa.Plugins.Register(plugin.Name, plugin.Path)
-	}
-
-	ioa.LoadApi()
-	//todo 为所有的 api 初始化插件数据
-
-	//log.Println("为所有api 初始化插件数据")
-	for _, api := range ioa.Apis {
-		for _, plugin := range api.Plugins {
-			log.Println("this api's plugins", api.Plugins)
-			log.Println("plugin range...........", plugin)
-			err := ioa.Plugins[plugin].InitApi(&api)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}
-
-	ioa.loadApiToRouter()
 	http.HandleFunc("/", ioa.ReverseProxy)
+	ioa.Load()
+	go ioa.Watch()
 
 	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
 	err := http.ListenAndServe(addr, nil)
@@ -57,10 +39,64 @@ func (ioa *Ioa) StartServer() {
 	}
 }
 
+func (ioa *Ioa) Watch() {
+	api := store.Api{}
+	go api.Watch(func() {
+		ioa.Load()
+	})
+}
+
+func (ioa *Ioa) Load() {
+	log.Println("ioa start Load data")
+	ioa.Apis = make(map[string]Api)
+	ioa.Plugins = make(Plugins)
+	ioa.Router.Clear()
+
+	//获取状 api 列表,注册到 ioa
+	for _, plugin := range app.Config.Plugins {
+		ioa.Plugins.Register(plugin.Name, plugin.Path)
+	}
+
+	//注册插件信息到 store
+	var plugins []proto.Plugin
+	for _, plugin := range ioa.Plugins {
+		plugins = append(plugins, proto.Plugin{
+			Name:      plugin.GetName(),
+			Describe:  plugin.GetDescribe(),
+			ConfigTpl: plugin.GetConfigTemplate(),
+		})
+	}
+	log.Println("ReCreate plugins info to store")
+	store.ReCreatePlugin(plugins)
+
+	//从数据库中加载 api
+	ioa.LoadApi()
+
+	//为所有的 api 使用的插件,初始化 config 和 api 缓存数据
+	for _, api := range ioa.Apis {
+		for _, plugin := range api.Plugins {
+			err := ioa.Plugins[plugin].InitApi(&api)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
+
+	//把 api 加载到router中
+	ioa.loadApiToRouter()
+}
+
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	path := r.URL.Path
 	apiId, params, _ := ioa.Router.FindRoute(method, path)
+
+	if apiId == "" {
+		w.WriteHeader(404)
+		w.Write([]byte("no find the router"))
+		return
+	}
+
 	log.Println("api id is ..... :", apiId)
 	log.Println("api params is :", params)
 	//todo match api, get model.Api
@@ -109,86 +145,51 @@ func (ioa *Ioa) loadApiToRouter() {
 }
 
 func (ioa *Ioa) LoadApi() {
-	apiGroup := model.ApiGroup{}
-	apiGroups, _, err := apiGroup.List("", "", -1, -1)
+	api := store.Api{}
+	apis, _, err := api.List()
 	if err != nil {
-		log.Panic("list apiGroup error", err.Error())
+		panic(err)
 	}
 
-	for _, group := range *apiGroups {
-		var apiGroupPolicies []string
-		var apiGroupPlugins []string
-		json.Unmarshal([]byte(group.Policies), &apiGroupPolicies)
-		json.Unmarshal([]byte(group.Plugins), &apiGroupPlugins)
-		//group policy plugins
-		var groupPoliciesPlugins []string
+	var newApiPlugins []string
+	newApiPluginsConfig := make(map[string]json.RawMessage)
 
-		//解析 groupAolicies, 从中取出 plugins
-		for _, policyId := range apiGroupPolicies {
-			policy := model.Policy{}
-			policy.Id = policyId
-			policy.Get()
+	type rawPlugin struct {
+		Name   string
+		Config json.RawMessage
+	}
+	for _, api := range apis {
+		var newRawPlugins []rawPlugin
 
-			var plugins []string
-			json.Unmarshal([]byte(policy.Plugins), &plugins)
-
-			groupPoliciesPlugins = append(groupPoliciesPlugins, plugins...)
+		if api.Plugins == "" {
+			api.Plugins = "[]"
 		}
 
-		for _, api := range group.Apis {
-			var newApiPolicies []string
-			var newApiPlugins []string
-			newApiPluginsConfig := make(map[string]json.RawMessage)
-			type rawPlugin struct {
-				Name   string
-				Config json.RawMessage
-			}
-			var newRawPlugins []rawPlugin
-			json.Unmarshal([]byte(api.Policies), &newApiPolicies)
-			json.Unmarshal([]byte(api.Plugins), &newRawPlugins)
-
-			for _, rawPlugin := range newRawPlugins {
-				newApiPlugins = append(newApiPlugins, rawPlugin.Name)
-				newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
-			}
-
-			//api policy plugins
-			var apiPoliciesPlugins []string
-			//解析 apiPolicies, 从中取出 plugins
-			for _, policyId := range newApiPolicies {
-				policy := model.Policy{}
-				policy.Id = policyId
-				policy.Get()
-				var plugins []string
-				json.Unmarshal([]byte(policy.Plugins), plugins)
-				apiPoliciesPlugins = append(apiPoliciesPlugins, plugins...)
-			}
-
-			newApiAllPlugins := append(groupPoliciesPlugins, apiGroupPlugins...)
-			newApiAllPlugins = append(newApiAllPlugins, apiPoliciesPlugins...)
-			newApiAllPlugins = append(newApiAllPlugins, newApiPlugins...)
-
-			newApi := Api{
-				ApiGroupId: api.ApiGroupId,
-				Name:       api.Name,
-				Describe:   api.Describe,
-				Path:       api.Path,
-				Method:     api.Method,
-				Status:     api.Status,
-
-				Targets:         api.Targets,
-				Params:          api.Params,
-				Policies:        newApiPolicies,
-				GroupPolicies:   apiGroupPolicies,
-				GroupPlugins:    apiGroupPlugins,
-				Plugins:         newApiPlugins,
-				AllPlugin:       newApiAllPlugins,
-				PluginRawConfig: newApiPluginsConfig,
-				PluginConfig:    make(map[string]interface{}),
-				PluginsData:     make(map[string]interface{}),
-			}
-
-			ioa.Apis[api.Id] = newApi
+		if err := json.Unmarshal([]byte(api.Plugins), &newRawPlugins); err != nil {
+			log.Println(err)
+			continue
 		}
+
+		for _, rawPlugin := range newRawPlugins {
+			newApiPlugins = append(newApiPlugins, rawPlugin.Name)
+			newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
+		}
+
+		newApi := Api{
+			ApiGroupId: api.ApiGroupId,
+			Name:       api.Name,
+			Describe:   api.Describe,
+			Path:       api.Path,
+			Method:     api.Method,
+			Status:     api.Status,
+
+			Targets:         api.Targets,
+			Plugins:         newApiPlugins,
+			PluginRawConfig: newApiPluginsConfig,
+			PluginConfig:    make(map[string]interface{}),
+			PluginsData:     make(map[string]interface{}),
+		}
+
+		ioa.Apis[api.Id] = newApi
 	}
 }

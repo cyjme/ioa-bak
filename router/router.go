@@ -24,7 +24,7 @@ func (r Router) FindRoute(method string, path string) (string, httprouter.Params
 	return routeId, param, tsr
 }
 
-func (r Router) Refresh() {
+func (r Router) Clear() {
 	r.router.ClearRoute("GET")
 	r.router.ClearRoute("POST")
 	r.router.ClearRoute("PUT")

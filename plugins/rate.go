@@ -4,7 +4,7 @@ import (
 	"errors"
 	"golang.org/x/time/rate"
 	"ioa"
-	"ioa/httpServer/app"
+	"ioa/proto"
 	"log"
 	"net/http"
 )
@@ -30,8 +30,8 @@ func (s ioaPlugin) GetDescribe() string {
 	return `rate_limit describe`
 }
 
-func (i ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
-	configTpl := ioa.ConfigTpl{
+func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+	configTpl := proto.ConfigTpl{
 		{Name: "Limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
 		{Name: "Burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
 	}
@@ -42,7 +42,6 @@ func (i ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
 func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	//limit := config["limit"].(float64)
 	log.Println("rate limiter plugin run")
-	log.Println("now count is ", app.Count)
 
 	data := api.PluginsData[name].(Data)
 	if !data.Limiter.Allow() {

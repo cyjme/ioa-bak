@@ -3,10 +3,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"ioa/httpServer/model"
 	"ioa/httpServer/pkg"
+	"ioa/store"
 	"net/http"
-	"strconv"
 )
 
 type ApiController struct {
@@ -18,13 +17,13 @@ type ApiController struct {
 // @Success 200 {string} json ""
 // @Router /apis [post]
 func (ctl *ApiController) Create(c *gin.Context) {
-	api := model.Api{}
+	api := store.Api{}
 
 	if err := pkg.ParseRequest(c, &api); err != nil {
 		return
 	}
 
-	if err := api.Insert(); err != nil {
+	if err := api.Put(); err != nil {
 		c.JSON(http.StatusBadGateway, err)
 		return
 	}
@@ -38,7 +37,7 @@ func (ctl *ApiController) Create(c *gin.Context) {
 // @Success 200 {string} json ""
 // @Router /apis/{apiId} [delete]
 func (ctl *ApiController) Delete(c *gin.Context) {
-	api := model.Api{}
+	api := store.Api{}
 	api.Id = c.Param("apiId")
 	err := api.Delete()
 
@@ -57,37 +56,14 @@ func (ctl *ApiController) Delete(c *gin.Context) {
 // @Success 200 {string} json ""
 // @Router /apis/{apiId} [put]
 func (ctl *ApiController) Put(c *gin.Context) {
-	api := model.Api{}
+	api := store.Api{}
 	api.Id = c.Param("apiId")
 
 	if err := pkg.ParseRequest(c, &api); err != nil {
 		return
 	}
 
-	err := api.Update()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, nil)
-}
-
-// @Summary Patch
-// @Tags    Api
-// @Param body body model.Api true "api"
-// @Param  apiId path string true "apiId"
-// @Success 200 {string} json ""
-// @Router /apis/{apiId} [patch]
-func (ctl *ApiController) Patch(c *gin.Context) {
-	api := model.Api{}
-	api.Id = c.Param("apiId")
-
-	if err := pkg.ParseRequest(c, &api); err != nil {
-		return
-	}
-
-	err := api.Patch()
+	err := api.Put()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -105,26 +81,11 @@ func (ctl *ApiController) Patch(c *gin.Context) {
 // @Success 200 {array} model.Api "api array"
 // @Router /apis [get]
 func (ctl *ApiController) List(c *gin.Context) {
-	api := &model.Api{}
+	api := &store.Api{}
 	api.Id = c.Param("apiId")
 	var err error
 
-	pageParam := c.DefaultQuery("page", "-1")
-	pageSizeParam := c.DefaultQuery("pageSize", "-1")
-	rawQuery := c.DefaultQuery("query", "")
-	rawOrder := c.DefaultQuery("order", "")
-
-	pageInt, err := strconv.Atoi(pageParam)
-	pageSizeInt, err := strconv.Atoi(pageSizeParam)
-
-	offset := pageInt*pageSizeInt - pageSizeInt
-	limit := pageSizeInt
-
-	if pageInt < 0 || pageSizeInt < 0 {
-		limit = -1
-	}
-
-	apis, total, err := api.List(rawQuery, rawOrder, offset, limit)
+	apis, total, err := api.List()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -142,7 +103,7 @@ func (ctl *ApiController) List(c *gin.Context) {
 // @Success 200 {object} model.Api "api object"
 // @Router /apis/{apiId} [get]
 func (ctl *ApiController) Get(c *gin.Context) {
-	api := &model.Api{}
+	api := &store.Api{}
 	api.Id = c.Param("apiId")
 
 	api, err := api.Get()

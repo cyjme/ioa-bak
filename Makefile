@@ -1,5 +1,6 @@
 all:
-	GOOS=linux GOARCH=amd64 go build -o ./release/ioa ./cli/main.go
+	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-httpServer ./cmd/httpServer/main.go
+	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-proxy ./cmd/proxy/main.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	#rm -rf plugins/*.so
@@ -13,7 +14,7 @@ all:
 dev:
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
-	go run cli/main.go
+	go run cmd/proxy/main.go
 clean:
 	@rm -rf ./release/*
 gotool:

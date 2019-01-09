@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"ioa"
+	"ioa/proto"
 	"log"
 	"net/http"
 	"strconv"
@@ -48,8 +49,8 @@ func (s ioaPlugin) GetDescribe() string {
 	return "request_size just get a request content-length"
 }
 
-func (s ioaPlugin) GetConfigTemplate() ioa.ConfigTpl {
-	configTpl := ioa.ConfigTpl{
+func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+	configTpl := proto.ConfigTpl{
 		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
 	}
 

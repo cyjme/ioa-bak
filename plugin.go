@@ -1,6 +1,7 @@
 package ioa
 
 import (
+	"ioa/proto"
 	"log"
 	"net/http"
 	goPlugin "plugin"
@@ -8,19 +9,10 @@ import (
 
 type Plugins map[string]IoaPlugin
 
-type Field struct {
-	Name      string `json:"name"`
-	Desc      string `json:"desc"`
-	Required  bool   `json:"required"`
-	FieldType string `json:"fieldType"`
-}
-
-type ConfigTpl []Field
-
 type IoaPlugin interface {
 	GetName() string
 	GetDescribe() string
-	GetConfigTemplate() ConfigTpl
+	GetConfigTemplate() proto.ConfigTpl
 	InitApi(api *Api) error
 	Run(w http.ResponseWriter, r *http.Request, api *Api) error
 }
@@ -28,11 +20,11 @@ type IoaPlugin interface {
 type Plugin struct {
 	Name      string    `json:"name"`
 	Describe  string    `json:"describe"`
-	ConfigTpl ConfigTpl `json:"configTpl"`
+	ConfigTpl proto.ConfigTpl `json:"configTpl"`
 }
 
-func (p Plugins) GetPluginConfigTpl(id string) ConfigTpl {
-	var configTpl ConfigTpl
+func (p Plugins) GetPluginConfigTpl(id string) proto.ConfigTpl {
+	var configTpl proto.ConfigTpl
 	configTpl = p[id].GetConfigTemplate()
 
 	return configTpl

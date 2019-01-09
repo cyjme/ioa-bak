@@ -1,22 +1,20 @@
-package router
+package main
 
 import (
 	"github.com/gin-gonic/gin"
-	_ "ioa/docs"
-	"ioa/httpServer/app"
 	"ioa/httpServer/pkg/middleware"
+	"ioa/httpServer/router"
+	"ioa/store"
 )
 
-func Start() {
+func main() {
+	store.Init()
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
-
-	//!!do not delete gen will generate router code at here
-
-	addr := app.Config.Http.Host + ":" + app.Config.Http.Port
+	router.RegisterRouter(r)
+	addr := "0.0.0.0:9992"
 
 	err := r.Run(addr) // listen and serve on 0.0.0.0:8080
-
 	if err != nil {
 		panic(err)
 	}
