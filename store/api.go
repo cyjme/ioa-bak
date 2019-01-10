@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/coreos/etcd/clientv3"
-	"ioa/httpServer/pkg/util"
 	"log"
 )
 
@@ -33,7 +32,6 @@ type Target struct {
 }
 
 func (api *Api) Put() error {
-	api.Id = util.GetRandomString(10)
 	apiByte, err := json.Marshal(api)
 	if err != nil {
 		return err
