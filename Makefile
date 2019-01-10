@@ -5,6 +5,8 @@ all:
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-proxy ./cmd/proxy/main.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
 	#rm -rf plugins/*.so
 	#@for FILE in $(shell ls plugins); do \
 	#	echo "building " $$FILE ;\
@@ -16,6 +18,8 @@ all:
 dev:
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
+	go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
+	go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
 	go run cmd/proxy/main.go
 
 linux:

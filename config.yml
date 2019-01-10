@@ -9,4 +9,8 @@ plugins:
     path: "plugins/size.so"
   - name: "rate_limit"
     path: "plugins/rate.so"
+  - name: "ip_black"
+    path: "plugins/black.so"
+  - name: "ip_white"
+    path: "plugins/white.so"
 
