@@ -26,7 +26,7 @@ type config struct {
 func InitConfig() {
 	//local
 	viper.SetConfigName("config")
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("./")
 	viper.SetConfigType("yml")
 	viper.ReadInConfig()
 	//viper.ReadConfig(bytes.NewBufferString(remoteConfig))

@@ -5,6 +5,7 @@ import (
 	"ioa/httpServer/pkg/middleware"
 	"ioa/httpServer/router"
 	"ioa/store"
+	_ "net/http/pprof"
 )
 
 func main() {

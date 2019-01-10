@@ -1,4 +1,6 @@
 all:
+	rm -rf release
+	mkdir release
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-httpServer ./cmd/httpServer/main.go
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-proxy ./cmd/proxy/main.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
@@ -15,6 +17,9 @@ dev:
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	go run cmd/proxy/main.go
+
+linux:
+	docker run -v "$$GOPATH":/go --rm -v "$$PWD":/go/src/myapp -w /go/src/myapp -e=GOOS=linux -e=GOARCH=amd64 -e=GO111MODULE=on  golang:latest make
 clean:
 	@rm -rf ./release/*
 gotool:

@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httputil"
+	_ "net/http/pprof"
 	"strings"
 )
 
@@ -89,7 +90,7 @@ func (ioa *Ioa) Load() {
 func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	path := r.URL.Path
-	apiId, params, _ := ioa.Router.FindRoute(method, path)
+	apiId, _, _ := ioa.Router.FindRoute(method, path)
 
 	if apiId == "" {
 		w.WriteHeader(404)
@@ -97,8 +98,6 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("api id is ..... :", apiId)
-	log.Println("api params is :", params)
 	//todo match api, get store.Api
 	api := ioa.Apis[apiId]
 
@@ -116,7 +115,6 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Println("receive request")
 
 	//todo find upstream info, and reverseProxy
 	targetsLen := len(api.Targets)
