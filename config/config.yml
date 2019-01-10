@@ -11,4 +11,6 @@ plugins:
     path: "plugins/rate.so"
   - name: "ip_black"
     path: "plugins/black.so"
+  - name: "ip_white"
+    path: "plugins/white.so"
 
