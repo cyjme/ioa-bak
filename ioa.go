@@ -2,13 +2,13 @@ package ioa
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"ioa/proto"
 	"ioa/router"
 	"ioa/store"
 	"log"
 	"math/rand"
 	"net/http"
-	"net/http/httputil"
 	_ "net/http/pprof"
 	"strings"
 )
@@ -126,15 +126,42 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	target := api.Targets[rand.Intn(len(api.Targets))]
 
-	director := func(req *http.Request) {
-		req.URL.Host = target.Host + ":" + target.Port
-		req.URL.Scheme = target.Scheme
-		req.URL.Path = target.Path
+	client := &http.Client{}
+	url := target.Scheme + target.Host + ":" + target.Port + target.Path
+	newReq, err := http.NewRequest(target.Method, url, r.Body)
+	if err != nil {
+		log.Println("err", err)
 	}
 
-	proxy := &httputil.ReverseProxy{Director: director}
-	proxy.ServeHTTP(w, r)
+	resp, err := client.Do(newReq)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	if err != nil {
+		log.Println("err", err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("err", err)
+	}
+
+	w.Header().Set("content-type", resp.Header.Get("content-type"))
+	w.Write(body)
+
+	//使用reverseProxy 导致连接不能复用。
+	//director := func(req *http.Request) {
+	//	req.URL.Host = target.Host + ":" + target.Port
+	//	req.URL.Scheme = target.Scheme
+	//	req.URL.Path = target.Path
+	//}
+	//
+	//proxy := &httputil.ReverseProxy{Director: director}
+	//proxy.ServeHTTP(w, r)
+
 	//todo plugin
+}
+
+func transferRequest(oldReq *http.Request) {
 }
 
 func (ioa *Ioa) loadApiToRouter() {
