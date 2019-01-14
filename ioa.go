@@ -2,7 +2,6 @@ package ioa
 
 import (
 	"encoding/json"
-	"ioa/httpServer/app"
 	"ioa/proto"
 	"ioa/router"
 	"ioa/store"
@@ -18,13 +17,15 @@ type Ioa struct {
 	Apis    map[string]Api
 	Plugins Plugins
 	Router  router.Router
+	Config  Config
 }
 
-func New() *Ioa {
+func New(config Config) *Ioa {
 	return &Ioa{
 		Apis:    make(map[string]Api),
 		Plugins: make(Plugins),
 		Router:  router.New(),
+		Config:  config,
 	}
 }
 
@@ -33,7 +34,7 @@ func (ioa *Ioa) StartServer() {
 	ioa.Load()
 	go ioa.Watch()
 
-	addr := app.Config.Ioa.Host + ":" + app.Config.Ioa.Port
+	addr := ioa.Config.Proxy.Host + ":" + ioa.Config.Proxy.Port
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		panic(err)
@@ -54,7 +55,7 @@ func (ioa *Ioa) Load() {
 	ioa.Router.Clear()
 
 	//获取状 api 列表,注册到 ioa
-	for _, plugin := range app.Config.Plugins {
+	for _, plugin := range ioa.Config.Plugins {
 		ioa.Plugins.Register(plugin.Name, plugin.Path)
 	}
 

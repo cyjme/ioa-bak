@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"github.com/gin-gonic/gin"
 	"ioa/httpServer/pkg/middleware"
 	"ioa/httpServer/router"
 	"ioa/store"
+	"log"
 	_ "net/http/pprof"
 )
 
@@ -13,9 +15,13 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 	router.RegisterRouter(r)
-	addr := "0.0.0.0:9992"
 
-	err := r.Run(addr) // listen and serve on 0.0.0.0:8080
+	var addr string
+	flag.StringVar(&addr, "addr", "0.0.0.0:9992", "")
+	flag.Parse()
+	log.Println("httpServer run at: ", addr)
+
+	err := r.Run(addr)
 	if err != nil {
 		panic(err)
 	}

@@ -2,13 +2,12 @@ package main
 
 import (
 	"ioa"
-	"ioa/httpServer/app"
 	"ioa/store"
 )
 
 func main() {
 	store.Init()
-	app.InitConfig()
-	Ioa := ioa.New()
+	config := ioa.ReadConfig()
+	Ioa := ioa.New(config)
 	Ioa.StartServer()
 }
