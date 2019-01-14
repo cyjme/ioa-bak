@@ -2,6 +2,7 @@ package ioa
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"ioa/proto"
 	"ioa/router"
@@ -20,6 +21,8 @@ type Ioa struct {
 	Config  Config
 }
 
+var client *http.Client
+
 func New(config Config) *Ioa {
 	return &Ioa{
 		Apis:    make(map[string]Api),
@@ -30,6 +33,17 @@ func New(config Config) *Ioa {
 }
 
 func (ioa *Ioa) StartServer() {
+	// Customize the Transport to have larger connection pool
+	defaultRoundTripper := http.DefaultTransport
+	defaultTransportPointer, ok := defaultRoundTripper.(*http.Transport)
+	if !ok {
+		panic(fmt.Sprintf("defaultRoundTripper not an *http.Transport"))
+	}
+	defaultTransport := *defaultTransportPointer // dereference it to get a copy of the struct that the pointer points to
+	defaultTransport.MaxIdleConns = ioa.Config.Proxy.MaxIdleConns
+	defaultTransport.MaxIdleConnsPerHost = ioa.Config.Proxy.MaxIdleConnsPerHost
+	client = &http.Client{Transport: &defaultTransport}
+
 	http.HandleFunc("/", ioa.ReverseProxy)
 	ioa.Load()
 	go ioa.Watch()
@@ -126,7 +140,6 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	target := api.Targets[rand.Intn(len(api.Targets))]
 
-	client := &http.Client{}
 	url := target.Scheme + target.Host + ":" + target.Port + target.Path
 	newReq, err := http.NewRequest(target.Method, url, r.Body)
 	if err != nil {
@@ -147,6 +160,7 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", resp.Header.Get("content-type"))
 	w.Write(body)
+	return
 
 	//使用reverseProxy 导致连接不能复用。
 	//director := func(req *http.Request) {

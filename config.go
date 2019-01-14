@@ -11,8 +11,10 @@ type plugin struct {
 
 type Config struct {
 	Proxy struct {
-		Host string `mapstructure:"host"`
-		Port string `mapstructure:"port"`
+		Host      string `mapstructure:"host"`
+		Port      string `mapstructure:"port"`
+		MaxIdleConns int    `mapstructure:"maxIdleConns"`
+		MaxIdleConnsPerHost int    `mapstructure:"maxIdleConnsPerHost"`
 	} `mapstructure:"proxy"`
 	Plugins []plugin `mapstructure:"plugins"`
 }

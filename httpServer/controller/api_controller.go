@@ -4,6 +4,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"ioa/httpServer/pkg"
+	"ioa/httpServer/pkg/util"
 	"ioa/store"
 	"net/http"
 )
@@ -18,6 +19,7 @@ type ApiController struct {
 // @Router /apis [post]
 func (ctl *ApiController) Create(c *gin.Context) {
 	api := store.Api{}
+	api.Id = util.GetRandomString(11)
 
 	if err := pkg.ParseRequest(c, &api); err != nil {
 		return
