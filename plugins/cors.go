@@ -40,6 +40,25 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		panic(err)
 	}
 
+	if rawConfig.AllowOrigin == "" {
+		rawConfig.AllowOrigin = "*"
+	}
+	if rawConfig.AllowMethods == "" {
+		rawConfig.AllowMethods = "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH"
+	}
+	if rawConfig.AllowHeaders == "" {
+		rawConfig.AllowHeaders = "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+	}
+	if rawConfig.ExposeHeaders == "" {
+		rawConfig.ExposeHeaders = "Content-Length"
+	}
+	if rawConfig.AllowCredentials == "" {
+		rawConfig.AllowCredentials = "true"
+	}
+	if rawConfig.MaxAge == "" {
+		rawConfig.MaxAge = "86400"
+	}
+
 	c.AllowOrigin = rawConfig.AllowOrigin
 	c.AllowMethods = rawConfig.AllowMethods
 	c.AllowHeaders = rawConfig.AllowHeaders
