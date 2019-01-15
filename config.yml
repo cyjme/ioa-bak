@@ -12,4 +12,6 @@ plugins:
     path: "plugins/black.so"
   - name: "ip_white"
     path: "plugins/white.so"
+  - name: "cors"
+    path: "plugins/cors.so"
 
