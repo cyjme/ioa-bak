@@ -37,7 +37,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 var name = "ip_white"
 
 func (s ioaPlugin) GetName() string {
-	return "ip_white"
+	return name
 }
 
 func (s ioaPlugin) GetDescribe() string {

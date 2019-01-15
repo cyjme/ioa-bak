@@ -140,8 +140,8 @@ func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	target := api.Targets[rand.Intn(len(api.Targets))]
 
-	url := target.Scheme + target.Host + ":" + target.Port + target.Path
-	newReq, err := http.NewRequest(target.Method, url, r.Body)
+	url := target.Scheme + "://" + target.Host + ":" + target.Port + target.Path
+	newReq, err := http.NewRequest(strings.ToUpper(target.Method), url, r.Body)
 	if err != nil {
 		log.Println("err", err)
 	}

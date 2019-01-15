@@ -7,6 +7,7 @@ all:
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/cors.so ./plugins/cors.go
 	#rm -rf plugins/*.so
 	#@for FILE in $(shell ls plugins); do \
 	#	echo "building " $$FILE ;\
@@ -20,6 +21,7 @@ dev:
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
 	go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
+	go build -buildmode=plugin -o ./plugins/cors.so ./plugins/cors.go
 	go run cmd/proxy/main.go
 
 linux:
