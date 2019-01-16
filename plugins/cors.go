@@ -16,12 +16,12 @@ type Data struct {
 }
 
 type Config struct {
-	AllowOrigin      string `json:"allowOrigin"`      //"*"
-	AllowMethods     string `json:"allowMethods"`     //"POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH"
-	AllowHeaders     string `json:"allowHeaders"`     //"Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Auth"
-	ExposeHeaders    string `json:"exposeHeaders"`    //"Content-Length"
-	AllowCredentials string `json:"allowCredentials"` //"true"
-	MaxAge           string `json:"maxAge"`           //"86400"
+	AllowOrigin      string `json:"allowOrigin"`
+	AllowMethods     string `json:"allowMethods"`
+	AllowHeaders     string `json:"allowHeaders"`
+	ExposeHeaders    string `json:"exposeHeaders"`
+	AllowCredentials string `json:"allowCredentials"`
+	MaxAge           string `json:"maxAge"`
 }
 
 type RawConfig struct {
@@ -81,12 +81,12 @@ func (s ioaPlugin) GetDescribe() string {
 
 func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
-		{Name: "allowOrigin", Desc: "", Required: false, FieldType: "string"},
-		{Name: "allowMethods", Desc: "", Required: false, FieldType: "string"},
-		{Name: "allowHeaders", Desc: "", Required: false, FieldType: "string"},
-		{Name: "exposeHeaders", Desc: "", Required: false, FieldType: "string"},
-		{Name: "allowCredentials", Desc: "", Required: false, FieldType: "string"},
-		{Name: "maxAge", Desc: "", Required: false, FieldType: "string"},
+		{Name: "allowOrigin", Desc: "* or http://www.test.com", Required: false, FieldType: "string"},
+		{Name: "allowMethods", Desc: "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH", Required: false, FieldType: "string"},
+		{Name: "allowHeaders", Desc: "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization", Required: false, FieldType: "string"},
+		{Name: "exposeHeaders", Desc: "Content-Length", Required: false, FieldType: "string"},
+		{Name: "allowCredentials", Desc: "true", Required: false, FieldType: "string"},
+		{Name: "maxAge", Desc: "86400", Required: false, FieldType: "string"},
 	}
 
 	return configTpl

@@ -17,7 +17,7 @@ type Data struct {
 }
 
 type Config struct {
-	Ips string `json:"ips"`
+	Ips []string `json:"ips"`
 }
 
 type RawConfig struct {
@@ -30,7 +30,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		panic(err)
 	}
-	c.Ips = string(rawConfig.Ips)
+	c.Ips = strings.Split(rawConfig.Ips, ",")
 	return nil
 }
 
@@ -46,7 +46,7 @@ func (s ioaPlugin) GetDescribe() string {
 
 func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
-		{Name: "ips", Desc: "blackIpList separated by ,", Required: true, FieldType: "string"},
+		{Name: "ips", Desc: "blackIpList separated by , (e.g.: 127.0.0.1,0.0.0.0)", Required: true, FieldType: "string"},
 	}
 
 	return configTpl
