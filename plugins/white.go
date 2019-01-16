@@ -30,7 +30,9 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		panic(err)
 	}
+
 	c.Ips = strings.Split(rawConfig.Ips, ",")
+
 	return nil
 }
 
@@ -81,10 +83,9 @@ func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) err
 	addr := r.RemoteAddr
 	ip := addr[0:strings.LastIndex(addr, ":")]
 	config := api.PluginConfig[name].(Config)
-	whiteIps := strings.Split(config.Ips, ",")
 	log.Println("request ip:", ip)
 
-	for _, i := range whiteIps {
+	for _, i := range config.Ips {
 		if i != ip {
 			continue
 		}
