@@ -14,4 +14,6 @@ plugins:
     path: "plugins/white.so"
   - name: "cors"
     path: "plugins/cors.so"
+  - name: "jwt"
+    path: "plugins/jwt.so"
 
