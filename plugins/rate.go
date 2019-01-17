@@ -5,11 +5,11 @@ import (
 	"golang.org/x/time/rate"
 	"ioa"
 	"ioa/proto"
-	"log"
 	"net/http"
 )
 
 type ioaPlugin struct {
+	ioa.BasePlugin
 }
 
 type Data struct {
@@ -26,7 +26,7 @@ func (i ioaPlugin) GetName() string {
 	return name
 }
 
-func (s ioaPlugin) GetDescribe() string {
+func (i ioaPlugin) GetDescribe() string {
 	return `rate_limit describe`
 }
 
@@ -41,12 +41,12 @@ func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 
 func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	//limit := config["limit"].(float64)
-	log.Println("rate limiter plugin run")
+	i.Logger().Debug("rate limiter plugin run")
 
 	data := api.PluginsData[name].(Data)
 	if !data.Limiter.Allow() {
 		w.Write([]byte("rate limit"))
-		log.Println("not allow")
+		i.Logger().Debug("not allow")
 		return errors.New("rate limit")
 	}
 

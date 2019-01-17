@@ -5,12 +5,12 @@ import (
 	"errors"
 	"ioa"
 	"ioa/proto"
-	"log"
 	"net/http"
 	"strings"
 )
 
 type ioaPlugin struct {
+	ioa.BasePlugin
 }
 
 type Data struct {
@@ -38,15 +38,15 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 var name = "ip_black"
 
-func (s ioaPlugin) GetName() string {
+func (i ioaPlugin) GetName() string {
 	return name
 }
 
-func (s ioaPlugin) GetDescribe() string {
+func (i ioaPlugin) GetDescribe() string {
 	return "ip_black forbid ip request"
 }
 
-func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
 		{Name: "ips", Desc: "blackIpList separated by , (e.g.: 127.0.0.1,0.0.0.0)", Required: true, FieldType: "string"},
 	}
@@ -74,16 +74,16 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	json.Unmarshal(api.PluginRawConfig[name], &config)
-	log.Println("this is config***********", config)
+	i.Logger().Debug("this is config***********", config)
 	api.PluginConfig[name] = config
 	return nil
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	addr := r.RemoteAddr
 	ip := addr[0:strings.LastIndex(addr, ":")]
 	config := api.PluginConfig[name].(Config)
-	log.Println("request ip:", ip)
+	i.Logger().Debug("request ip:", ip)
 
 	for _, i := range config.Ips {
 		if i == ip {

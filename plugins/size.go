@@ -5,12 +5,12 @@ import (
 	"errors"
 	"ioa"
 	"ioa/proto"
-	"log"
 	"net/http"
 	"strconv"
 )
 
 type ioaPlugin struct {
+	ioa.BasePlugin
 }
 
 type Data struct {
@@ -41,15 +41,15 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 var name = "request_size"
 
-func (s ioaPlugin) GetName() string {
+func (i ioaPlugin) GetName() string {
 	return "request_size"
 }
 
-func (s ioaPlugin) GetDescribe() string {
+func (i ioaPlugin) GetDescribe() string {
 	return "request_size just get a request content-length"
 }
 
-func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
 		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
 	}
@@ -77,14 +77,14 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	json.Unmarshal(api.PluginRawConfig[name], &config)
-	log.Println("this is config***********", config)
+	i.Logger().Debug("this is config***********", config)
 
 	api.PluginConfig[name] = config
 
 	return nil
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	contentLength := r.ContentLength
 	config := api.PluginConfig[name].(Config)
 
@@ -93,7 +93,7 @@ func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) err
 		w.Write([]byte("contentLength too large"))
 		return errors.New("contentLength too large")
 	}
-	log.Println("request content length:", contentLength)
+	i.Logger().Debug("request content length:", contentLength)
 
 	return nil
 }

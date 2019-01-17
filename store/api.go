@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/coreos/etcd/clientv3"
-	"log"
+	logger "ioa/log"
 )
+
+var log = logger.Get()
 
 const prefix = "apis/"
 
@@ -95,7 +97,7 @@ func (api *Api) Watch(callback func()) {
 
 	for wresp := range responseWatchChannel {
 		for _, ev := range wresp.Events {
-			log.Println("watch api change")
+			log.Debug("watch api change")
 			log.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 
 			callback()

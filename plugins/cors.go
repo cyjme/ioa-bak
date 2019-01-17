@@ -5,11 +5,11 @@ import (
 	"errors"
 	"ioa"
 	"ioa/proto"
-	"log"
 	"net/http"
 )
 
 type ioaPlugin struct {
+	ioa.BasePlugin
 }
 
 type Data struct {
@@ -71,15 +71,15 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 var name = "cors"
 
-func (s ioaPlugin) GetName() string {
+func (i ioaPlugin) GetName() string {
 	return name
 }
 
-func (s ioaPlugin) GetDescribe() string {
+func (i ioaPlugin) GetDescribe() string {
 	return "set CORS"
 }
 
-func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
 		{Name: "allowOrigin", Desc: "* or http://www.test.com", Required: false, FieldType: "string"},
 		{Name: "allowMethods", Desc: "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH", Required: false, FieldType: "string"},
@@ -112,12 +112,12 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	json.Unmarshal(api.PluginRawConfig[name], &config)
-	log.Println("this is config***********", config)
+	i.Logger().Debug("this is config***********", config)
 	api.PluginConfig[name] = config
 	return nil
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	config := api.PluginConfig[name].(Config)
 
 	w.Header().Set("Access-Control-Allow-Origin", config.AllowOrigin)

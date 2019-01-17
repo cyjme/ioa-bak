@@ -5,10 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"ioa/httpServer/pkg/middleware"
 	"ioa/httpServer/router"
+	logger "ioa/log"
 	"ioa/store"
-	"log"
 	_ "net/http/pprof"
 )
+
+var log = logger.Get()
 
 func main() {
 	store.Init()
@@ -19,7 +21,7 @@ func main() {
 	var addr string
 	flag.StringVar(&addr, "addr", "0.0.0.0:9992", "")
 	flag.Parse()
-	log.Println("httpServer run at: ", addr)
+	log.Debug("httpServer run at: ", addr)
 
 	err := r.Run(addr)
 	if err != nil {

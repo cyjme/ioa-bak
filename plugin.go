@@ -1,8 +1,8 @@
 package ioa
 
 import (
+	"github.com/sirupsen/logrus"
 	"ioa/proto"
-	"log"
 	"net/http"
 	goPlugin "plugin"
 )
@@ -18,8 +18,8 @@ type IoaPlugin interface {
 }
 
 type Plugin struct {
-	Name      string    `json:"name"`
-	Describe  string    `json:"describe"`
+	Name      string          `json:"name"`
+	Describe  string          `json:"describe"`
 	ConfigTpl proto.ConfigTpl `json:"configTpl"`
 }
 
@@ -34,21 +34,28 @@ func (p Plugins) Register(id string, path string) {
 	plugin, err := goPlugin.Open(path)
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Debug(err.Error())
 	}
 
 	symbol, err := plugin.Lookup("IoaPlugin")
 	if err != nil {
-		log.Println("lookup plugin error", err.Error())
+		log.Debug("lookup plugin error", err.Error())
 	}
 
 	var ioaPlugin IoaPlugin
 	ioaPlugin, ok := symbol.(IoaPlugin)
 
 	if !ok {
-		log.Println("load plugin error")
+		log.Debug("load plugin error")
 		return
 	}
 
 	p[id] = ioaPlugin
+}
+
+type BasePlugin struct {
+}
+
+func (b *BasePlugin) Logger() *logrus.Logger {
+	return log
 }

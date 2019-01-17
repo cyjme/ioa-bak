@@ -7,12 +7,12 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"ioa"
 	"ioa/proto"
-	"log"
 	"net/http"
 	"strings"
 )
 
 type ioaPlugin struct {
+	ioa.BasePlugin
 }
 
 type Data struct {
@@ -43,15 +43,15 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 var name = "jwt"
 
-func (s ioaPlugin) GetName() string {
+func (i ioaPlugin) GetName() string {
 	return name
 }
 
-func (s ioaPlugin) GetDescribe() string {
+func (i ioaPlugin) GetDescribe() string {
 	return "jwt Authorization Bearer"
 }
 
-func (s ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
 		{Name: "jwtSecret", Desc: "jwt secret key", Required: true, FieldType: "string"},
 		{Name: "claimsKeys", Desc: "fields in token, separated by , (e.g.:user_id,user_name)", Required: true, FieldType: "string"},
@@ -80,12 +80,12 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	json.Unmarshal(api.PluginRawConfig[name], &config)
-	log.Println("this is config***********", config)
+	i.Logger().Debug("this is config***********", config)
 	api.PluginConfig[name] = config
 	return nil
 }
 
-func (s ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	config := api.PluginConfig[name].(Config)
 	jwtSecret := config.JwtSecret
 	claimsKeys := config.ClaimsKeys

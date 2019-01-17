@@ -3,12 +3,10 @@ package ioa
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	logger "ioa/log"
 	"ioa/proto"
 	"ioa/router"
 	"ioa/store"
-	"log"
-	"math/rand"
 	"net/http"
 	_ "net/http/pprof"
 	"strings"
@@ -22,6 +20,7 @@ type Ioa struct {
 }
 
 var client *http.Client
+var log = logger.Get()
 
 func New(config Config) *Ioa {
 	return &Ioa{
@@ -44,7 +43,7 @@ func (ioa *Ioa) StartServer() {
 	defaultTransport.MaxIdleConnsPerHost = ioa.Config.Proxy.MaxIdleConnsPerHost
 	client = &http.Client{Transport: &defaultTransport}
 
-	http.HandleFunc("/", ioa.ReverseProxy)
+	http.HandleFunc("/", ioa.reverseProxy)
 	ioa.Load()
 	go ioa.Watch()
 
@@ -63,7 +62,7 @@ func (ioa *Ioa) Watch() {
 }
 
 func (ioa *Ioa) Load() {
-	log.Println("ioa start Load data")
+	log.Debug("ioa start Load data")
 	ioa.Apis = make(map[string]Api)
 	ioa.Plugins = make(Plugins)
 	ioa.Router.Clear()
@@ -82,7 +81,7 @@ func (ioa *Ioa) Load() {
 			ConfigTpl: plugin.GetConfigTemplate(),
 		})
 	}
-	log.Println("ReCreate plugins info to store")
+	log.Debug("ReCreate plugins info to store")
 	store.ReCreatePlugin(plugins)
 
 	//从数据库中加载 api
@@ -93,93 +92,13 @@ func (ioa *Ioa) Load() {
 		for _, plugin := range api.Plugins {
 			err := ioa.Plugins[plugin].InitApi(&api)
 			if err != nil {
-				log.Println(err)
+				log.Debug(err)
 			}
 		}
 	}
 
 	//把 api 加载到router中
 	ioa.loadApiToRouter()
-}
-
-func (ioa *Ioa) ReverseProxy(w http.ResponseWriter, r *http.Request) {
-	method := r.Method
-	path := r.URL.Path
-	apiId, _, _ := ioa.Router.FindRoute(method, path)
-
-	if apiId == "" {
-		w.WriteHeader(404)
-		w.Write([]byte("no find the router"))
-		return
-	}
-
-	//todo match api, get store.Api
-	api := ioa.Apis[apiId]
-
-	for _, plugin := range api.Plugins {
-		plugin, exist := ioa.Plugins[plugin]
-		if !exist {
-			w.Write([]byte("the api use unexist plugin:" + plugin.GetName()))
-			return
-		}
-
-		name := plugin.GetName()
-		log.Println("plugin will run", name)
-		err := plugin.Run(w, r, &api)
-		if err != nil {
-			return
-		}
-	}
-
-	//todo find upstream info, and reverseProxy
-	targetsLen := len(api.Targets)
-	if targetsLen == 0 {
-		w.Write([]byte("no target"))
-		return
-	}
-
-	target := api.Targets[rand.Intn(len(api.Targets))]
-
-	url := target.Scheme + target.Host + ":" + target.Port + target.Path
-	newReq, err := http.NewRequest(strings.ToUpper(target.Method), url, r.Body)
-	newReq.Header = r.Header
-	if err != nil {
-		log.Println("err", err)
-	}
-
-	resp, err := client.Do(newReq)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	if err != nil {
-		log.Println("err", err)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-
-
-
-	if err != nil {
-		log.Println("err", err)
-	}
-
-	w.Header().Set("content-type", resp.Header.Get("content-type"))
-	w.Write(body)
-	return
-
-	//使用reverseProxy 导致连接不能复用。
-	//director := func(req *http.Request) {
-	//	req.URL.Host = target.Host + ":" + target.Port
-	//	req.URL.Scheme = target.Scheme
-	//	req.URL.Path = target.Path
-	//}
-	//
-	//proxy := &httputil.ReverseProxy{Director: director}
-	//proxy.ServeHTTP(w, r)
-
-	//todo plugin
-}
-
-func transferRequest(oldReq *http.Request) {
 }
 
 func (ioa *Ioa) loadApiToRouter() {
@@ -210,7 +129,7 @@ func (ioa *Ioa) LoadApi() {
 		}
 
 		if err := json.Unmarshal([]byte(api.Plugins), &newRawPlugins); err != nil {
-			log.Println(err)
+			log.Debug(err)
 			continue
 		}
 
