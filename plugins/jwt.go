@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"ioa"
 	"ioa/proto"
@@ -19,7 +18,7 @@ type Data struct {
 }
 
 type Config struct {
-	JwtSecret  string `json:"jwtSecret"`
+	JwtSecret  string   `json:"jwtSecret"`
 	ClaimsKeys []string `json:"claimsKeys"`
 }
 
@@ -126,7 +125,7 @@ func (i ioaPlugin) throwErr(err error) error {
 func parseJwtToken(key, token string) (jwt.MapClaims, error) {
 	t, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, errors.New("unexpected signing method")
 		}
 		return []byte(key), nil
 	})
@@ -134,7 +133,7 @@ func parseJwtToken(key, token string) (jwt.MapClaims, error) {
 	if mc, ok := t.Claims.(jwt.MapClaims); ok {
 		return mc, nil
 	}
-	return nil, fmt.Errorf("interface.(jwt.MapClaims) error")
+	return nil, errors.New("interface.(jwt.MapClaims) error")
 }
 
 var IoaPlugin ioaPlugin

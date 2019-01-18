@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	logger "ioa/log"
+	"ioa/monitor"
 	"ioa/proto"
 	"ioa/router"
 	"ioa/store"
@@ -32,7 +33,6 @@ func New(config Config) *Ioa {
 }
 
 func (ioa *Ioa) StartServer() {
-	// Customize the Transport to have larger connection pool
 	defaultRoundTripper := http.DefaultTransport
 	defaultTransportPointer, ok := defaultRoundTripper.(*http.Transport)
 	if !ok {
@@ -42,8 +42,8 @@ func (ioa *Ioa) StartServer() {
 	defaultTransport.MaxIdleConns = ioa.Config.Proxy.MaxIdleConns
 	defaultTransport.MaxIdleConnsPerHost = ioa.Config.Proxy.MaxIdleConnsPerHost
 	client = &http.Client{Transport: &defaultTransport}
-
 	http.HandleFunc("/", ioa.reverseProxy)
+	http.HandleFunc("/monitor", monitor.Handle)
 	ioa.Load()
 	go ioa.Watch()
 

@@ -34,6 +34,9 @@ type Target struct {
 }
 
 func (api *Api) Put() error {
+	if api.Targets == nil{
+		api.Targets = make([]Target, 0)
+	}
 	apiByte, err := json.Marshal(api)
 	if err != nil {
 		return err
