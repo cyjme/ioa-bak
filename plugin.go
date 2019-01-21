@@ -7,20 +7,14 @@ import (
 	goPlugin "plugin"
 )
 
-type Plugins map[string]IoaPlugin
+type Plugins map[string]Plugin
 
-type IoaPlugin interface {
+type Plugin interface {
 	GetName() string
 	GetDescribe() string
 	GetConfigTemplate() proto.ConfigTpl
 	InitApi(api *Api) error
 	Run(w http.ResponseWriter, r *http.Request, api *Api) error
-}
-
-type Plugin struct {
-	Name      string          `json:"name"`
-	Describe  string          `json:"describe"`
-	ConfigTpl proto.ConfigTpl `json:"configTpl"`
 }
 
 func (p Plugins) GetPluginConfigTpl(id string) proto.ConfigTpl {
@@ -37,13 +31,13 @@ func (p Plugins) Register(id string, path string) {
 		log.Debug(err.Error())
 	}
 
-	symbol, err := plugin.Lookup("IoaPlugin")
+	symbol, err := plugin.Lookup("ExportPlugin")
 	if err != nil {
 		log.Debug("lookup plugin error", err.Error())
 	}
 
-	var ioaPlugin IoaPlugin
-	ioaPlugin, ok := symbol.(IoaPlugin)
+	var ioaPlugin Plugin
+	ioaPlugin, ok := symbol.(Plugin)
 
 	if !ok {
 		log.Debug("load plugin error")

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type ioaPlugin struct {
+type Plugin struct {
 	ioa.BasePlugin
 }
 
@@ -58,15 +58,15 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (i ioaPlugin) GetName() string {
+func (i Plugin) GetName() string {
 	return name
 }
 
-func (i ioaPlugin) GetDescribe() string {
+func (i Plugin) GetDescribe() string {
 	return `rate_limit describe`
 }
 
-func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
+func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
 		{Name: "limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
 		{Name: "burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
@@ -75,7 +75,7 @@ func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	return configTpl
 }
 
-func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	//limit := config["limit"].(float64)
 
 	data := api.PluginsData[name].(Data)
@@ -87,7 +87,7 @@ func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) err
 	return nil
 }
 
-func (i ioaPlugin) InitApi(api *ioa.Api) error {
+func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
 		return i.throwErr(err)
@@ -100,7 +100,7 @@ func (i ioaPlugin) InitApi(api *ioa.Api) error {
 	return nil
 }
 
-func (i ioaPlugin) InitApiData(api *ioa.Api) error {
+func (i Plugin) InitApiData(api *ioa.Api) error {
 	config := api.PluginConfig[name].(Config)
 	var Limiter = rate.NewLimiter(config.Limit, config.Burst)
 
@@ -111,7 +111,7 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 	return nil
 }
 
-func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
+func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	err := json.Unmarshal(api.PluginRawConfig[name], &config)
 
@@ -124,8 +124,8 @@ func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i ioaPlugin) throwErr(err error) error {
+func (i Plugin) throwErr(err error) error {
 	return errors.New("plugin" + name + err.Error())
 }
 
-var IoaPlugin ioaPlugin
+var ExportPlugin Plugin
