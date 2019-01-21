@@ -76,8 +76,11 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
-	json.Unmarshal(api.PluginRawConfig[name], &config)
-	i.Logger().Debug("this is config***********", config)
+	err := json.Unmarshal(api.PluginRawConfig[name], &config)
+	if err != nil {
+		return err
+	}
+	i.Logger().Debug("plugin init api config success:" + name)
 
 	api.PluginConfig[name] = config
 
@@ -93,7 +96,6 @@ func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) err
 		w.Write([]byte("contentLength too large"))
 		return errors.New("contentLength too large")
 	}
-	i.Logger().Debug("request content length:", contentLength)
 
 	return nil
 }

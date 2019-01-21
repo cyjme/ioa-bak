@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"golang.org/x/time/rate"
 	"ioa"
 	"ioa/proto"
 	"net/http"
+	"strconv"
 )
 
 type ioaPlugin struct {
@@ -16,11 +18,45 @@ type Data struct {
 	Limiter *rate.Limiter
 }
 type Config struct {
-	limit rate.Limit
-	burst int
+	Limit rate.Limit `json:"limit"`
+	Burst int        `json:"burst"`
 }
 
 var name = "rate_limit"
+
+const DEFAULT_BURST = "0"
+const DEFAULT_LIMIT = "0"
+
+type RawConfig struct {
+	Limit string `json:"limit"`
+	Burst string `json:"burst"`
+}
+
+func (c *Config) UnmarshalJSON(b []byte) error {
+	rawConfig := RawConfig{}
+	err := json.Unmarshal(b, &rawConfig)
+	if err != nil {
+		return err
+	}
+	if rawConfig.Burst == "" {
+		rawConfig.Burst = DEFAULT_BURST
+	}
+	if rawConfig.Limit == "" {
+		rawConfig.Limit = DEFAULT_LIMIT
+	}
+	limitInt, err := strconv.Atoi(rawConfig.Limit)
+	if err != nil {
+		return err
+	}
+	burstInt, err := strconv.Atoi(rawConfig.Burst)
+	if err != nil {
+		return err
+	}
+	c.Limit = rate.Limit(limitInt)
+	c.Burst = burstInt
+
+	return nil
+}
 
 func (i ioaPlugin) GetName() string {
 	return name
@@ -32,8 +68,8 @@ func (i ioaPlugin) GetDescribe() string {
 
 func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 	configTpl := proto.ConfigTpl{
-		{Name: "Limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
-		{Name: "Burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
+		{Name: "limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
+		{Name: "burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
 	}
 
 	return configTpl
@@ -41,12 +77,10 @@ func (i ioaPlugin) GetConfigTemplate() proto.ConfigTpl {
 
 func (i ioaPlugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
 	//limit := config["limit"].(float64)
-	i.Logger().Debug("rate limiter plugin run")
 
 	data := api.PluginsData[name].(Data)
 	if !data.Limiter.Allow() {
 		w.Write([]byte("rate limit"))
-		i.Logger().Debug("not allow")
 		return errors.New("rate limit")
 	}
 
@@ -68,7 +102,7 @@ func (i ioaPlugin) InitApi(api *ioa.Api) error {
 
 func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 	config := api.PluginConfig[name].(Config)
-	var Limiter = rate.NewLimiter(config.limit, config.burst)
+	var Limiter = rate.NewLimiter(config.Limit, config.Burst)
 
 	api.PluginsData[name] = Data{
 		Limiter: Limiter,
@@ -78,30 +112,14 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 }
 
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
-	//limitString, exist := api.PluginRawConfig["rate_limit_limit"]
-	//if !exist {
-	//	return i.throwErr(errors.New("config field doesn't exist"))
-	//}
-	//burstString, exist := api.PluginRawConfig["rate_limit_burst"]
-	//
-	//if !exist {
-	//	return i.throwErr(errors.New("config field doesn't exist"))
-	//}
-	//burst, err := strconv.Atoi(burstString)
-	//if err != nil {
-	//	return i.throwErr(err)
-	//}
-	//
-	//limit, err := strconv.Atoi(limitString)
-	//if err != nil {
-	//	return i.throwErr(err)
-	//}
-	//
-	//config := Config{
-	//	limit: rate.Limit(limit),
-	//	burst: burst,
-	//}
-	//api.PluginConfig[name] = config
+	var config Config
+	err := json.Unmarshal(api.PluginRawConfig[name], &config)
+
+	if err != nil {
+		return err
+	}
+	api.PluginConfig[name] = config
+	i.Logger().Debug("plugin init api config success:" + name)
 
 	return nil
 }

@@ -67,7 +67,7 @@ func (ioa *Ioa) Load() {
 	ioa.Plugins = make(Plugins)
 	ioa.Router.Clear()
 
-	//获取状 api 列表,注册到 ioa
+	//获取状 plugins config,注册到 ioa
 	for _, plugin := range ioa.Config.Plugins {
 		ioa.Plugins.Register(plugin.Name, plugin.Path)
 	}
@@ -110,6 +110,7 @@ func (ioa *Ioa) loadApiToRouter() {
 func (ioa *Ioa) LoadApi() {
 	api := store.Api{}
 	apis, _, err := api.List()
+	log.Debug("read api from store: ", apis)
 	if err != nil {
 		panic(err)
 	}
@@ -155,4 +156,6 @@ func (ioa *Ioa) LoadApi() {
 
 		ioa.Apis[api.Id] = newApi
 	}
+
+	log.Debug("load api from store to ioa", ioa.Apis)
 }

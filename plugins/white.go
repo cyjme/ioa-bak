@@ -74,7 +74,6 @@ func (i ioaPlugin) InitApiData(api *ioa.Api) error {
 func (i ioaPlugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
 	json.Unmarshal(api.PluginRawConfig[name], &config)
-	i.Logger().Debug("this is config***********", config)
 	api.PluginConfig[name] = config
 	return nil
 }

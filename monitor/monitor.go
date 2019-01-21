@@ -26,8 +26,8 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	hostInfo, _ := host.Info()
 
 	memory := memory{
-		Used:  v.Used / 1024 / 1024 / 1024,
-		Total: v.Total / 1024 / 1024 / 1024,
+		Used:  v.Used / 1024 / 1024,
+		Total: v.Total / 1024 / 1024,
 	}
 
 	sysInfo := sysInfo{
