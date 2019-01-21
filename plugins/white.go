@@ -78,10 +78,10 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	addr := r.RemoteAddr
+func (i Plugin) Run(ctx ioa.Context) error {
+	addr := ctx.Request.RemoteAddr
 	ip := addr[0:strings.LastIndex(addr, ":")]
-	config := api.PluginConfig[name].(Config)
+	config := ctx.Api.PluginConfig[name].(Config)
 	i.Logger().Debug("request ip:", ip)
 
 	for _, i := range config.Ips {
@@ -90,8 +90,8 @@ func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error 
 		}
 		return nil
 	}
-	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte("request ip is not in the ipWhiteList"))
+	ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
+	ctx.ResponseWriter.Write([]byte("request ip is not in the ipWhiteList"))
 	return errors.New("ip forbidden")
 }
 

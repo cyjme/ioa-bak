@@ -5,7 +5,6 @@ import (
 	"errors"
 	"ioa"
 	"ioa/proto"
-	"net/http"
 )
 
 type Plugin struct {
@@ -117,15 +116,15 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	config := api.PluginConfig[name].(Config)
+func (i Plugin) Run(ctx ioa.Context) error {
+	config := ctx.Api.PluginConfig[name].(Config)
 
-	w.Header().Set("Access-Control-Allow-Origin", config.AllowOrigin)
-	w.Header().Set("Access-Control-Max-Age", config.MaxAge)
-	w.Header().Set("Access-Control-Allow-Methods", config.AllowMethods)
-	w.Header().Set("Access-Control-Allow-Headers", config.AllowHeaders)
-	w.Header().Set("Access-Control-Expose-Headers", config.ExposeHeaders)
-	w.Header().Set("Access-Control-Allow-Credentials", config.AllowCredentials)
+	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", config.AllowOrigin)
+	ctx.ResponseWriter.Header().Set("Access-Control-Max-Age", config.MaxAge)
+	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Methods", config.AllowMethods)
+	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", config.AllowHeaders)
+	ctx.ResponseWriter.Header().Set("Access-Control-Expose-Headers", config.ExposeHeaders)
+	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", config.AllowCredentials)
 
 	return nil
 }

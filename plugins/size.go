@@ -87,13 +87,13 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	contentLength := r.ContentLength
-	config := api.PluginConfig[name].(Config)
+func (i Plugin) Run(ctx ioa.Context) error {
+	contentLength := ctx.Request.ContentLength
+	config := ctx.Api.PluginConfig[name].(Config)
 
 	if contentLength > config.MaxSize {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("contentLength too large"))
+		ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
+		ctx.ResponseWriter.Write([]byte("contentLength too large"))
 		return errors.New("contentLength too large")
 	}
 

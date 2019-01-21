@@ -84,35 +84,35 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	config := api.PluginConfig[name].(Config)
+func (i Plugin) Run(ctx ioa.Context) error {
+	config := ctx.Api.PluginConfig[name].(Config)
 	jwtSecret := config.JwtSecret
 	claimsKeys := config.ClaimsKeys
 
-	authorization := r.Header.Get("Authorization")
+	authorization := ctx.Request.Header.Get("Authorization")
 	if !strings.Contains(authorization, "Bearer") {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("error Header Authorization"))
+		ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		ctx.ResponseWriter.Write([]byte("error Header Authorization"))
 		return nil
 	}
 
 	token := string([]byte(authorization)[7:])
 	if token == "null" {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("error Header Authorization"))
+		ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		ctx.ResponseWriter.Write([]byte("error Header Authorization"))
 		return nil
 	}
 
 	claims, err := parseJwtToken(jwtSecret, token)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("parse token err"))
+		ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		ctx.ResponseWriter.Write([]byte("parse token err"))
 		return nil
 	}
 
 	//todo claims.VerifyExpiresAt
 	for _, claimsKey := range claimsKeys {
-		r.Header.Add(claimsKey, claims[claimsKey].(string))
+		ctx.Request.Header.Add(claimsKey, claims[claimsKey].(string))
 	}
 
 	return nil

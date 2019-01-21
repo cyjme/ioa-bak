@@ -100,15 +100,15 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	config := api.PluginConfig[name].(Config)
+func (i Plugin) Run(ctx ioa.Context) error {
+	config := ctx.Api.PluginConfig[name].(Config)
 
 	if !config.Enable {
 		return nil
 	}
 
-	data := api.PluginsData[name].(Data)
-	cache, exist := data[r.URL.Path]
+	data := ctx.Api.PluginsData[name].(Data)
+	cache, exist := data[ctx.Request.URL.Path]
 	if !exist {
 		return nil
 	}

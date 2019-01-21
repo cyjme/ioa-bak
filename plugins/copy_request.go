@@ -84,11 +84,11 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
-	config := api.PluginConfig[name].(Config)
+func (i Plugin) Run(ctx ioa.Context) error {
+	config := ctx.Api.PluginConfig[name].(Config)
 
 	for _, url := range config.Urls {
-		err := doRequest(r, url)
+		err := doRequest(ctx.Request, url)
 		if err != nil {
 			return err
 		}

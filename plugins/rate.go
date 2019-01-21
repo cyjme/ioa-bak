@@ -6,7 +6,6 @@ import (
 	"golang.org/x/time/rate"
 	"ioa"
 	"ioa/proto"
-	"net/http"
 	"strconv"
 )
 
@@ -75,12 +74,12 @@ func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
 	return configTpl
 }
 
-func (i Plugin) Run(w http.ResponseWriter, r *http.Request, api *ioa.Api) error {
+func (i Plugin) Run(ctx ioa.Context) error {
 	//limit := config["limit"].(float64)
 
-	data := api.PluginsData[name].(Data)
+	data := ctx.Api.PluginsData[name].(Data)
 	if !data.Limiter.Allow() {
-		w.Write([]byte("rate limit"))
+		ctx.ResponseWriter.Write([]byte("rate limit"))
 		return errors.New("rate limit")
 	}
 
