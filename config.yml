@@ -4,6 +4,8 @@ proxy:
   maxIdleConns: 1000
   maxIdleConnsPerHost: 1000
 plugins:
+  - name: "copy_request"
+    path: "plugins/copy_request.so"
   - name: "request_size"
     path: "plugins/size.so"
   - name: "rate_limit"

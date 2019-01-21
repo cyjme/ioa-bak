@@ -9,6 +9,7 @@ all:
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/cors.so ./plugins/cors.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/jwt.so ./plugins/jwt.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.go
 	#rm -rf plugins/*.so
 	#@for FILE in $(shell ls plugins); do \
 	#	echo "building " $$FILE ;\
@@ -18,6 +19,7 @@ all:
 	#	go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
 	#done
 dev:
+	go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.go
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
