@@ -18,4 +18,8 @@ plugins:
     path: "plugins/cors.so"
   - name: "jwt"
     path: "plugins/jwt.so"
+  - name: "cache"
+    path: "plugins/cache.so"
+  - name: "cache_response"
+    path: "plugins/cache_response.so"
 
