@@ -84,7 +84,7 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(ctx ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 	config := ctx.Api.PluginConfig[name].(Config)
 	jwtSecret := config.JwtSecret
 	claimsKeys := config.ClaimsKeys
@@ -136,4 +136,7 @@ func parseJwtToken(key, token string) (jwt.MapClaims, error) {
 	return nil, errors.New("interface.(jwt.MapClaims) error")
 }
 
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+	return nil
+}
 var ExportPlugin Plugin

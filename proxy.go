@@ -35,12 +35,16 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 			Request:        r,
 			Response:       nil,
 			Api:            &api,
+			Cancel:         false,
 		}
-		err := plugin.Run(ctx)
+		err := plugin.ReceiveRequest(&ctx)
 		if err != nil {
 			log.Error("plugin run error :", err)
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte("gateway error plugin run error"))
+			return
+		}
+		if ctx.Cancel {
 			return
 		}
 	}

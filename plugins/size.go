@@ -87,7 +87,7 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(ctx ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 	contentLength := ctx.Request.ContentLength
 	config := ctx.Api.PluginConfig[name].(Config)
 
@@ -102,6 +102,10 @@ func (i Plugin) Run(ctx ioa.Context) error {
 
 func (i Plugin) throwErr(err error) error {
 	return errors.New("plugin" + name + err.Error())
+}
+
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+	return nil
 }
 
 var ExportPlugin Plugin

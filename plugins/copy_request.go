@@ -84,7 +84,7 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	return nil
 }
 
-func (i Plugin) Run(ctx ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 	config := ctx.Api.PluginConfig[name].(Config)
 
 	for _, url := range config.Urls {
@@ -121,4 +121,7 @@ func doRequest(r *http.Request, url string) error {
 	return nil
 }
 
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+	return nil
+}
 var ExportPlugin Plugin

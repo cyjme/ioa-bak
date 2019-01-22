@@ -14,7 +14,8 @@ type Plugin interface {
 	GetDescribe() string
 	GetConfigTemplate() proto.ConfigTpl
 	InitApi(api *Api) error
-	Run(context Context) error
+	ReceiveRequest(context *Context) error
+	ReceiveResponse(context *Context) error
 }
 
 type Context struct {
@@ -22,6 +23,7 @@ type Context struct {
 	Request        *http.Request
 	Response       *http.Response
 	Api            *Api
+	Cancel         bool
 }
 
 func (p Plugins) GetPluginConfigTpl(id string) proto.ConfigTpl {

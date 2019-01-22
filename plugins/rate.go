@@ -74,7 +74,7 @@ func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
 	return configTpl
 }
 
-func (i Plugin) Run(ctx ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 	//limit := config["limit"].(float64)
 
 	data := ctx.Api.PluginsData[name].(Data)
@@ -127,4 +127,7 @@ func (i Plugin) throwErr(err error) error {
 	return errors.New("plugin" + name + err.Error())
 }
 
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+	return nil
+}
 var ExportPlugin Plugin
