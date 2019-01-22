@@ -3,6 +3,7 @@ all:
 	mkdir release
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-httpServer ./cmd/httpServer/main.go
 	GOOS=linux GOARCH=amd64 go build -o ./release/ioa-proxy ./cmd/proxy/main.go
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/cache.so ./plugins/cache.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/black.so ./plugins/black.go
@@ -19,6 +20,7 @@ all:
 	#	go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
 	#done
 dev:
+	go build -buildmode=plugin -o ./plugins/cache.so ./plugins/cache.go
 	go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.go
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go
 	go build -buildmode=plugin -o ./plugins/rate.so ./plugins/rate.go

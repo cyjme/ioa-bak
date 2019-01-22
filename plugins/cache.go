@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"ioa"
 	"ioa/proto"
 	"net/http"
@@ -15,8 +16,14 @@ type Plugin struct {
 }
 
 type Cache struct {
-	Data           http.Response
+	Response       Response
 	LastUpdateTime time.Time
+}
+
+type Response struct {
+	Header     http.Header
+	StatusCode int
+	Body       []byte
 }
 type Data map[string]Cache
 
@@ -45,7 +52,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	c.TTL = time.Duration(uint64(ttlInt))
+	c.TTL = time.Second * time.Duration(uint64(ttlInt))
 
 	return nil
 }
@@ -113,9 +120,18 @@ func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 		return nil
 	}
 	now := time.Now()
-	if now.Sub(cache.LastUpdateTime) > config.TTL {
-
+	if now.Sub(cache.LastUpdateTime) < config.TTL {
+		for name, values := range cache.Response.Header {
+			ctx.ResponseWriter.Header()[name] = values
+		}
+		ctx.ResponseWriter.WriteHeader(cache.Response.StatusCode)
+		_, err := ctx.ResponseWriter.Write(cache.Response.Body)
+		if err != nil {
+			return err
+		}
+		ctx.Cancel = true
 	}
+
 	return nil
 }
 
@@ -124,6 +140,21 @@ func (i Plugin) throwErr(err error) error {
 }
 
 func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+	data := ctx.Api.PluginsData[name].(Data)
+	body, err := ioutil.ReadAll(ctx.Response.Body)
+	if err != nil {
+		return err
+	}
+	data[ctx.Request.URL.Path] = Cache{
+		Response: Response{
+			Header:     ctx.Response.Header,
+			Body:       body,
+			StatusCode: ctx.Response.StatusCode,
+		},
+		LastUpdateTime: time.Now(),
+	}
+	ctx.Api.PluginsData[name] = data
+
 	return nil
 }
 

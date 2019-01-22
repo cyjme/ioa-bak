@@ -21,6 +21,14 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	//todo match api, get store.Api
 	api := ioa.Apis[apiId]
 
+	ctx := Context{
+		ResponseWriter: w,
+		Request:        r,
+		Response:       nil,
+		Api:            &api,
+		Cancel:         false,
+	}
+
 	for _, plugin := range api.Plugins {
 		plugin, exist := ioa.Plugins[plugin]
 		if !exist {
@@ -30,13 +38,6 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 
 		name := plugin.GetName()
 		log.Debug("plugin will run", name)
-		ctx := Context{
-			ResponseWriter: w,
-			Request:        r,
-			Response:       nil,
-			Api:            &api,
-			Cancel:         false,
-		}
 		err := plugin.ReceiveRequest(&ctx)
 		if err != nil {
 			log.Error("plugin run error :", err)
@@ -71,6 +72,27 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		log.Debug("err", err)
+	}
+
+	ctx.Response = resp
+	for _, plugin := range api.Plugins {
+		plugin, exist := ioa.Plugins[plugin]
+		if !exist {
+			w.Write([]byte("the api use unexist plugin:" + plugin.GetName()))
+			return
+		}
+		name := plugin.GetName()
+		log.Debug("plugin will run", name)
+		err := plugin.ReceiveResponse(&ctx)
+		if err != nil {
+			log.Error("plugin run ReceiveResponse error :", err)
+			w.WriteHeader(http.StatusBadGateway)
+			w.Write([]byte("gateway error plugin run error: " + err.Error()))
+			return
+		}
+		if ctx.Cancel {
+			return
+		}
 	}
 
 	for name, values := range resp.Header {
