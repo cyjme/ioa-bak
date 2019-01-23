@@ -23,6 +23,7 @@ type Config struct {
 var (
 	name = "rate_limit"
 	desc = "rate_limit desc"
+	tags = []string{"traffic control"}
 )
 
 var configTpl = proto.ConfigTpl{
@@ -66,6 +67,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

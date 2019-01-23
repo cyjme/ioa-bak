@@ -77,6 +77,7 @@ func (ioa *Ioa) Load() {
 	for _, plugin := range ioa.Plugins {
 		plugins = append(plugins, proto.Plugin{
 			Name:      plugin.GetName(),
+			Tags:      plugin.GetTags(),
 			Describe:  plugin.GetDescribe(),
 			ConfigTpl: plugin.GetConfigTemplate(),
 		})

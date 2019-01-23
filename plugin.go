@@ -10,6 +10,7 @@ type Plugins map[string]Plugin
 
 type Plugin interface {
 	GetName() string
+	GetTags() []string
 	GetDescribe() string
 	GetConfigTemplate() proto.ConfigTpl
 	InitApi(api *Api) error

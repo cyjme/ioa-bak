@@ -11,6 +11,7 @@ import (
 var (
 	name = "ip_white"
 	desc = "ip_white"
+	tags = []string{"security"}
 )
 
 type Plugin struct {
@@ -42,6 +43,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

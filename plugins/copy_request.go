@@ -13,6 +13,7 @@ import (
 var (
 	name = "copy_request"
 	desc = "copy_request to new url"
+	tags = []string{"traffic control"}
 )
 
 var configTpl = proto.ConfigTpl{
@@ -46,6 +47,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

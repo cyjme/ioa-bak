@@ -13,6 +13,7 @@ import (
 var (
 	name = "cache"
 	desc = "cache response, request path is identification"
+	tags = []string{"traffic control"}
 )
 var configTpl = proto.ConfigTpl{
 	{Name: "Enable", Desc: "enable api cache", Required: true, FieldType: "bool"},
@@ -67,6 +68,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

@@ -13,6 +13,7 @@ import (
 var (
 	name = "jwt"
 	desc = "jwt Authorization Bearer"
+	tags = []string{"security"}
 )
 
 var configTpl = proto.ConfigTpl{
@@ -52,6 +53,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

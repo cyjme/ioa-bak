@@ -11,6 +11,7 @@ import (
 var (
 	name = "ip_black"
 	desc = "ip_black forbid ip request"
+	tags = []string{"security"}
 )
 
 var configTpl = proto.ConfigTpl{
@@ -50,6 +51,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

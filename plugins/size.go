@@ -11,6 +11,7 @@ import (
 var (
 	name = "request_size"
 	desc = "request_size just get a request content-length"
+	tags = []string{"traffic control"}
 
 	RESP_CONTENT_TOO_LARGE = "contentLength too large"
 )
@@ -52,6 +53,10 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 func (i Plugin) GetName() string {
 	return name
+}
+
+func (i Plugin) GetTags() []string {
+	return tags
 }
 
 func (i Plugin) GetDescribe() string {

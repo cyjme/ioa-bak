@@ -2,6 +2,7 @@ package proto
 
 type Plugin struct {
 	Name      string    `json:"name"`
+	Tags      []string  `json:"tags"`
 	Describe  string    `json:"describe"`
 	ConfigTpl ConfigTpl `json:"configTpl"`
 }
