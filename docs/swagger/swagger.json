@@ -11,32 +11,6 @@
                     "Api"
                 ],
                 "summary": "List",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "query, ?query=age:\u003e:21,name:like:%jason%",
-                        "name": "query",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order, ?order=age:desc,created_at:asc",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "pageSize",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "api array",
@@ -158,7 +132,23 @@
                 }
             }
         },
+        "/apisWithTag": {
+            "get": {
+                "tags": [
+                    "Api"
+                ],
+                "summary": "ListWithTag"
+            }
+        },
         "/plugins": {
+            "get": {
+                "tags": [
+                    "Plugin"
+                ],
+                "summary": "Get"
+            }
+        },
+        "/pluginsWithTag": {
             "get": {
                 "tags": [
                     "Plugin"
@@ -194,6 +184,12 @@
                 },
                 "status": {
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "targets": {
                     "type": "array",

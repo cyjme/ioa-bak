@@ -17,6 +17,10 @@ definitions:
         type: string
       status:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
       targets:
         items:
           $ref: '#/definitions/store.Target'
@@ -41,23 +45,6 @@ info:
 paths:
   /apis:
     get:
-      parameters:
-      - description: query, ?query=age:>:21,name:like:%jason%
-        in: query
-        name: query
-        type: string
-      - description: order, ?order=age:desc,created_at:asc
-        in: query
-        name: order
-        type: string
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: pageSize
-        in: query
-        name: pageSize
-        type: integer
       responses:
         "200":
           description: api array
@@ -139,7 +126,17 @@ paths:
       summary: Put
       tags:
       - Api
+  /apisWithTag:
+    get:
+      summary: ListWithTag
+      tags:
+      - Api
   /plugins:
+    get:
+      summary: Get
+      tags:
+      - Plugin
+  /pluginsWithTag:
     get:
       summary: Get
       tags:

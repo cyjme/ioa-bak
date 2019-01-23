@@ -76,12 +76,7 @@ func (ctl *ApiController) Put(c *gin.Context) {
 
 // @Summary ListWithTag
 // @Tags    Api
-// @Param query query string false "query, ?query=age:>:21,name:like:%jason%"
-// @Param order query string false "order, ?order=age:desc,created_at:asc"
-// @Param page query int false "page"
-// @Param pageSize query int false "pageSize"
-// @Success 200 {array} store.Api "api array"
-// @Router /apis [get]
+// @Router /apisWithTag [get]
 func (ctl *ApiController) ListWithTag(c *gin.Context) {
 	api := &store.Api{}
 	api.Id = c.Param("apiId")
@@ -119,10 +114,6 @@ func (ctl *ApiController) ListWithTag(c *gin.Context) {
 
 // @Summary List
 // @Tags    Api
-// @Param query query string false "query, ?query=age:>:21,name:like:%jason%"
-// @Param order query string false "order, ?order=age:desc,created_at:asc"
-// @Param page query int false "page"
-// @Param pageSize query int false "pageSize"
 // @Success 200 {array} store.Api "api array"
 // @Router /apis [get]
 func (ctl *ApiController) List(c *gin.Context) {
