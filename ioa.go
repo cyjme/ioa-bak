@@ -92,7 +92,7 @@ func (ioa *Ioa) Load() {
 		for _, plugin := range api.Plugins {
 			err := ioa.Plugins[plugin].InitApi(&api)
 			if err != nil {
-				log.Debug(err)
+				log.Error(ioa.Plugins[plugin].GetName() + ERR_INIT_API_PLUGIN.Error() + err.Error())
 			}
 		}
 	}

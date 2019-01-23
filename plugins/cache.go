@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"ioa"
 	"ioa/proto"
@@ -10,6 +9,15 @@ import (
 	"strconv"
 	"time"
 )
+
+var (
+	name = "cache"
+	desc = "cache response, request path is identification"
+)
+var configTpl = proto.ConfigTpl{
+	{Name: "Enable", Desc: "enable api cache", Required: true, FieldType: "bool"},
+	{Name: "TTL", Desc: "response data time to live, in seconds", Required: true, FieldType: "uint"},
+}
 
 type Plugin struct {
 	ioa.BasePlugin
@@ -41,7 +49,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	rawConfig := RawConfig{}
 	err := json.Unmarshal(b, &rawConfig)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	c.Enable = false
 	if rawConfig.Enable == "1" {
@@ -57,33 +65,26 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const name = "cache"
-
 func (i Plugin) GetName() string {
 	return name
 }
 
 func (i Plugin) GetDescribe() string {
-	return "cache response, request path is identification"
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
-	configTpl := proto.ConfigTpl{
-		{Name: "Enable", Desc: "enable api cache", Required: true, FieldType: "bool"},
-		{Name: "TTL", Desc: "response data time to live, in seconds", Required: true, FieldType: "uint"},
-	}
-
 	return configTpl
 }
 
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -100,24 +101,22 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	if err != nil {
 		return err
 	}
-	i.Logger().Debug("plugin init api config success,plugin: " + name + "api: " + api.Name)
-
 	api.PluginConfig[name] = config
 
 	return nil
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	config := ctx.Api.PluginConfig[name].(Config)
 
 	if !config.Enable {
-		return nil
+		return
 	}
 
 	data := ctx.Api.PluginsData[name].(Data)
 	cache, exist := data[ctx.Request.URL.Path]
 	if !exist {
-		return nil
+		return
 	}
 	now := time.Now()
 	if now.Sub(cache.LastUpdateTime) < config.TTL {
@@ -127,23 +126,17 @@ func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 		ctx.ResponseWriter.WriteHeader(cache.Response.StatusCode)
 		_, err := ctx.ResponseWriter.Write(cache.Response.Body)
 		if err != nil {
-			return err
 		}
-		ctx.Cancel = true
+		ctx.Cancel()
 	}
-
-	return nil
 }
 
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
-}
-
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
 	data := ctx.Api.PluginsData[name].(Data)
 	body, err := ioutil.ReadAll(ctx.Response.Body)
 	if err != nil {
-		return err
+		ctx.Cancel()
+		return
 	}
 	data[ctx.Request.URL.Path] = Cache{
 		Response: Response{
@@ -154,8 +147,6 @@ func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
 		LastUpdateTime: time.Now(),
 	}
 	ctx.Api.PluginsData[name] = data
-
-	return nil
 }
 
 var ExportPlugin Plugin

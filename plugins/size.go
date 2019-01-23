@@ -2,12 +2,22 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"ioa"
 	"ioa/proto"
 	"net/http"
 	"strconv"
 )
+
+var (
+	name = "request_size"
+	desc = "request_size just get a request content-length"
+
+	RESP_CONTENT_TOO_LARGE = "contentLength too large"
+)
+
+var configTpl = proto.ConfigTpl{
+	{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
+}
 
 type Plugin struct {
 	ioa.BasePlugin
@@ -15,6 +25,7 @@ type Plugin struct {
 
 type Data struct {
 }
+
 type Config struct {
 	MaxSize int64 `json:"maxSize"`
 }
@@ -27,44 +38,38 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	rawConfig := RawConfig{}
 	err := json.Unmarshal(b, &rawConfig)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	maxSize, err := strconv.ParseInt(rawConfig.MaxSize, 10, 64)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	c.MaxSize = maxSize
 	return nil
 }
 
-var name = "request_size"
-
 func (i Plugin) GetName() string {
-	return "request_size"
+	return name
 }
 
 func (i Plugin) GetDescribe() string {
-	return "request_size just get a request content-length"
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
-	configTpl := proto.ConfigTpl{
-		{Name: "maxSize", Desc: "maxSize", Required: true, FieldType: "int64"},
-	}
-
 	return configTpl
 }
 
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -80,32 +85,23 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	if err != nil {
 		return err
 	}
-	i.Logger().Debug("plugin init api config success:" + name)
-
 	api.PluginConfig[name] = config
 
 	return nil
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	contentLength := ctx.Request.ContentLength
 	config := ctx.Api.PluginConfig[name].(Config)
 
 	if contentLength > config.MaxSize {
 		ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
-		ctx.ResponseWriter.Write([]byte("contentLength too large"))
-		return errors.New("contentLength too large")
+		ctx.ResponseWriter.Write([]byte(RESP_CONTENT_TOO_LARGE))
+		ctx.Cancel()
 	}
-
-	return nil
 }
 
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
-}
-
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
-	return nil
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
 }
 
 var ExportPlugin Plugin

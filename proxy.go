@@ -26,7 +26,7 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 		Request:        r,
 		Response:       nil,
 		Api:            &api,
-		Cancel:         false,
+		Next:           true,
 	}
 
 	for _, plugin := range api.Plugins {
@@ -36,16 +36,8 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := plugin.GetName()
-		log.Debug("plugin will run", name)
-		err := plugin.ReceiveRequest(&ctx)
-		if err != nil {
-			log.Error("plugin run error :", err)
-			w.WriteHeader(http.StatusBadGateway)
-			w.Write([]byte("gateway error plugin run error"))
-			return
-		}
-		if ctx.Cancel {
+		plugin.ReceiveRequest(&ctx)
+		if !ctx.Next {
 			return
 		}
 	}
@@ -81,16 +73,8 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("the api use unexist plugin:" + plugin.GetName()))
 			return
 		}
-		name := plugin.GetName()
-		log.Debug("plugin will run", name)
-		err := plugin.ReceiveResponse(&ctx)
-		if err != nil {
-			log.Error("plugin run ReceiveResponse error :", err)
-			w.WriteHeader(http.StatusBadGateway)
-			w.Write([]byte("gateway error plugin run error: " + err.Error()))
-			return
-		}
-		if ctx.Cancel {
+		plugin.ReceiveResponse(&ctx)
+		if !ctx.Next {
 			return
 		}
 	}

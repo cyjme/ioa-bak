@@ -2,10 +2,23 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"ioa"
 	"ioa/proto"
 )
+
+var (
+	name = "cors"
+	desc = "set cors"
+)
+
+var configTpl = proto.ConfigTpl{
+	{Name: "allowOrigin", Desc: "* or http://www.test.com", Required: false, FieldType: "string"},
+	{Name: "allowMethods", Desc: "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH", Required: false, FieldType: "string"},
+	{Name: "allowHeaders", Desc: "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization", Required: false, FieldType: "string"},
+	{Name: "exposeHeaders", Desc: "Content-Length", Required: false, FieldType: "string"},
+	{Name: "allowCredentials", Desc: "true", Required: false, FieldType: "string"},
+	{Name: "maxAge", Desc: "86400", Required: false, FieldType: "string"},
+}
 
 type Plugin struct {
 	ioa.BasePlugin
@@ -36,7 +49,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	rawConfig := RawConfig{}
 	err := json.Unmarshal(b, &rawConfig)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if rawConfig.AllowOrigin == "" {
@@ -68,37 +81,26 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var name = "cors"
-
 func (i Plugin) GetName() string {
 	return name
 }
 
 func (i Plugin) GetDescribe() string {
-	return "set CORS"
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
-	configTpl := proto.ConfigTpl{
-		{Name: "allowOrigin", Desc: "* or http://www.test.com", Required: false, FieldType: "string"},
-		{Name: "allowMethods", Desc: "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH", Required: false, FieldType: "string"},
-		{Name: "allowHeaders", Desc: "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization", Required: false, FieldType: "string"},
-		{Name: "exposeHeaders", Desc: "Content-Length", Required: false, FieldType: "string"},
-		{Name: "allowCredentials", Desc: "true", Required: false, FieldType: "string"},
-		{Name: "maxAge", Desc: "86400", Required: false, FieldType: "string"},
-	}
-
 	return configTpl
 }
 
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -110,13 +112,16 @@ func (i Plugin) InitApiData(api *ioa.Api) error {
 
 func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
-	json.Unmarshal(api.PluginRawConfig[name], &config)
-	i.Logger().Debug("this is config***********", config)
+	err := json.Unmarshal(api.PluginRawConfig[name], &config)
+	if err != nil {
+		return err
+	}
 	api.PluginConfig[name] = config
+
 	return nil
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	config := ctx.Api.PluginConfig[name].(Config)
 
 	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", config.AllowOrigin)
@@ -125,15 +130,10 @@ func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", config.AllowHeaders)
 	ctx.ResponseWriter.Header().Set("Access-Control-Expose-Headers", config.ExposeHeaders)
 	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", config.AllowCredentials)
-
-	return nil
 }
 
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
+	return
 }
 
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
-	return nil
-}
 var ExportPlugin Plugin

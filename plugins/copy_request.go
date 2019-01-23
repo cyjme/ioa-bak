@@ -3,13 +3,21 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"ioa"
 	"ioa/proto"
 	"net/http"
 	"strings"
 )
+
+var (
+	name = "copy_request"
+	desc = "copy_request to new url"
+)
+
+var configTpl = proto.ConfigTpl{
+	{Name: "urls", Desc: "urls split by ,", Required: true, FieldType: "string"},
+}
 
 type Plugin struct {
 	ioa.BasePlugin
@@ -36,32 +44,26 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const name = "copy_request"
-
 func (i Plugin) GetName() string {
 	return name
 }
 
 func (i Plugin) GetDescribe() string {
-	return "copy_request to new url"
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
-	configTpl := proto.ConfigTpl{
-		{Name: "urls", Desc: "urls split by ,", Required: true, FieldType: "string"},
-	}
-
 	return configTpl
 }
 
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -77,28 +79,22 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	if err != nil {
 		return err
 	}
-	i.Logger().Debug("plugin init api config success,plugin: " + name + "api: " + api.Name)
-
 	api.PluginConfig[name] = config
 
 	return nil
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	config := ctx.Api.PluginConfig[name].(Config)
 
 	for _, url := range config.Urls {
 		err := doRequest(ctx.Request, url)
 		if err != nil {
-			return err
+			return
 		}
 	}
 
-	return nil
-}
-
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
+	return
 }
 
 func doRequest(r *http.Request, url string) error {
@@ -121,7 +117,8 @@ func doRequest(r *http.Request, url string) error {
 	return nil
 }
 
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
-	return nil
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
+	return
 }
+
 var ExportPlugin Plugin

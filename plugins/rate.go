@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"golang.org/x/time/rate"
 	"ioa"
 	"ioa/proto"
@@ -21,7 +20,15 @@ type Config struct {
 	Burst int        `json:"burst"`
 }
 
-var name = "rate_limit"
+var (
+	name = "rate_limit"
+	desc = "rate_limit desc"
+)
+
+var configTpl = proto.ConfigTpl{
+	{Name: "limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
+	{Name: "burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
+}
 
 const DEFAULT_BURST = "0"
 const DEFAULT_LIMIT = "0"
@@ -62,38 +69,33 @@ func (i Plugin) GetName() string {
 }
 
 func (i Plugin) GetDescribe() string {
-	return `rate_limit describe`
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
-	configTpl := proto.ConfigTpl{
-		{Name: "limit", Desc: "The number of events per second.", Required: true, FieldType: "float64"},
-		{Name: "burst", Desc: "The number of events for burst", Required: true, FieldType: "float64"},
-	}
 
 	return configTpl
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	//limit := config["limit"].(float64)
 
 	data := ctx.Api.PluginsData[name].(Data)
 	if !data.Limiter.Allow() {
 		ctx.ResponseWriter.Write([]byte("rate limit"))
-		return errors.New("rate limit")
+		ctx.Cancel()
+		return
 	}
-
-	return nil
 }
 
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -118,16 +120,11 @@ func (i Plugin) InitApiConfig(api *ioa.Api) error {
 		return err
 	}
 	api.PluginConfig[name] = config
-	i.Logger().Debug("plugin init api config success:" + name)
 
 	return nil
 }
 
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
 }
 
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
-	return nil
-}
 var ExportPlugin Plugin

@@ -2,11 +2,15 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"ioa"
 	"ioa/proto"
 	"net/http"
 	"strings"
+)
+
+var (
+	name = "ip_white"
+	desc = "ip_white"
 )
 
 type Plugin struct {
@@ -36,14 +40,12 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var name = "ip_white"
-
 func (i Plugin) GetName() string {
 	return name
 }
 
 func (i Plugin) GetDescribe() string {
-	return "ip_white allow ip request"
+	return desc
 }
 
 func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
@@ -57,11 +59,11 @@ func (i Plugin) GetConfigTemplate() proto.ConfigTpl {
 func (i Plugin) InitApi(api *ioa.Api) error {
 	err := i.InitApiConfig(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 	err = i.InitApiData(api)
 	if err != nil {
-		return i.throwErr(err)
+		return err
 	}
 
 	return nil
@@ -73,12 +75,16 @@ func (i Plugin) InitApiData(api *ioa.Api) error {
 
 func (i Plugin) InitApiConfig(api *ioa.Api) error {
 	var config Config
-	json.Unmarshal(api.PluginRawConfig[name], &config)
+	err := json.Unmarshal(api.PluginRawConfig[name], &config)
+	if err != nil {
+		return err
+	}
 	api.PluginConfig[name] = config
+
 	return nil
 }
 
-func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
+func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	addr := ctx.Request.RemoteAddr
 	ip := addr[0:strings.LastIndex(addr, ":")]
 	config := ctx.Api.PluginConfig[name].(Config)
@@ -88,18 +94,15 @@ func (i Plugin) ReceiveRequest(ctx *ioa.Context) error {
 		if i != ip {
 			continue
 		}
-		return nil
+		return
 	}
 	ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
 	ctx.ResponseWriter.Write([]byte("request ip is not in the ipWhiteList"))
-	return errors.New("ip forbidden")
+	ctx.Cancel()
+	return
 }
 
-func (i Plugin) throwErr(err error) error {
-	return errors.New("plugin" + name + err.Error())
+func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
 }
 
-func (i Plugin) ReceiveResponse(ctx *ioa.Context) error {
-	return nil
-}
 var ExportPlugin Plugin
