@@ -51,6 +51,8 @@ func RegisterRouter(r *gin.Engine) {
 		apiGroup.GET("/:apiId", apiController.Get)
 	}
 
+	r.GET("/apisWithTag", apiController.ListWithTag)
+
 	pluginController := controller.PluginController{}
 	r.GET("/plugins", pluginController.List)
 	r.GET("/pluginsWithTag", pluginController.ListWithTag)

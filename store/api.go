@@ -13,13 +13,14 @@ var log = logger.Get()
 const prefix = "apis/"
 
 type Api struct {
-	Id         string `json:"id"`
-	ApiGroupId string `json:"apiGroupId"`
-	Name       string `json:"name"`
-	Describe   string `json:"describe"`
-	Path       string `json:"path"`
-	Method     string `json:"method"`
-	Status     string `json:"status"`
+	Id         string   `json:"id"`
+	ApiGroupId string   `json:"apiGroupId"`
+	Name       string   `json:"name"`
+	Tags       []string `json:"tags"`
+	Describe   string   `json:"describe"`
+	Path       string   `json:"path"`
+	Method     string   `json:"method"`
+	Status     string   `json:"status"`
 
 	Targets []Target `json:"targets"`
 	Plugins string   `json:"plugins"`

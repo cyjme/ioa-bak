@@ -74,6 +74,49 @@ func (ctl *ApiController) Put(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// @Summary ListWithTag
+// @Tags    Api
+// @Param query query string false "query, ?query=age:>:21,name:like:%jason%"
+// @Param order query string false "order, ?order=age:desc,created_at:asc"
+// @Param page query int false "page"
+// @Param pageSize query int false "pageSize"
+// @Success 200 {array} store.Api "api array"
+// @Router /apis [get]
+func (ctl *ApiController) ListWithTag(c *gin.Context) {
+	api := &store.Api{}
+	api.Id = c.Param("apiId")
+	var err error
+
+	apis, total, err := api.List()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	tag2Apis := make(map[string][]store.Api, 0)
+
+	for _, api := range apis {
+		if len(api.Tags) == 0 {
+			tag := "default"
+			oldTagApis := tag2Apis[tag]
+			tag2Apis[tag] = append(oldTagApis, api)
+		}
+
+		for _, tag := range api.Tags {
+			if tag == "" {
+				tag = "default"
+			}
+			oldTagApis := tag2Apis[tag]
+			tag2Apis[tag] = append(oldTagApis, api)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"total": total,
+		"data":  tag2Apis,
+	})
+}
+
 // @Summary List
 // @Tags    Api
 // @Param query query string false "query, ?query=age:>:21,name:like:%jason%"
