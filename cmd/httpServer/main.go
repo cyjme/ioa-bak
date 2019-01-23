@@ -21,7 +21,7 @@ func main() {
 	var addr string
 	flag.StringVar(&addr, "addr", "0.0.0.0:9992", "")
 	flag.Parse()
-	log.Debug("httpServer run at: ", addr)
+	log.Info("httpServer run at: ", addr)
 
 	err := r.Run(addr)
 	if err != nil {

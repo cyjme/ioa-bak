@@ -3,7 +3,6 @@ package ioa
 import (
 	"github.com/sirupsen/logrus"
 	"ioa/proto"
-	"net/http"
 	goPlugin "plugin"
 )
 
@@ -18,18 +17,6 @@ type Plugin interface {
 	ReceiveResponse(context *Context)
 }
 
-type Context struct {
-	ResponseWriter http.ResponseWriter
-	Request        *http.Request
-	Response       *http.Response
-	Api            *Api
-	Next           bool
-}
-
-func (c *Context) Cancel() {
-	c.Next = false
-}
-
 func (p Plugins) GetPluginConfigTpl(id string) proto.ConfigTpl {
 	var configTpl proto.ConfigTpl
 	configTpl = p[id].GetConfigTemplate()
@@ -41,19 +28,19 @@ func (p Plugins) Register(id string, path string) {
 	plugin, err := goPlugin.Open(path)
 
 	if err != nil {
-		log.Debug(err.Error())
+		log.Error(ERR_PLUGIN_OPEN_FILE, err.Error())
 	}
 
 	symbol, err := plugin.Lookup("ExportPlugin")
 	if err != nil {
-		log.Debug("lookup plugin error", err.Error())
+		log.Error(ERR_PLUGIN_LOOKUP, err.Error())
 	}
 
 	var ioaPlugin Plugin
 	ioaPlugin, ok := symbol.(Plugin)
 
 	if !ok {
-		log.Debug("load plugin error")
+		log.Error(ERR_PLUGIN_TYPE_ASSERTION)
 		return
 	}
 

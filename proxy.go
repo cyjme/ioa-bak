@@ -42,7 +42,6 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	//todo find upstream info, and reverseProxy
 	targetsLen := len(api.Targets)
 	if targetsLen == 0 {
 		w.Write([]byte("no target"))
@@ -55,7 +54,7 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	newReq, err := http.NewRequest(strings.ToUpper(target.Method), url, r.Body)
 	newReq.Header = r.Header
 	if err != nil {
-		log.Debug("err", err)
+		log.Debug(ERR_PROXY_CREATE_REQUEST, err)
 	}
 
 	resp, err := client.Do(newReq)
@@ -63,14 +62,14 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		log.Debug("err", err)
+		log.Debug(ERR_PROXY_DO_REQUEST, err)
 	}
 
 	ctx.Response = resp
 	for _, plugin := range api.Plugins {
 		plugin, exist := ioa.Plugins[plugin]
 		if !exist {
-			w.Write([]byte("the api use unexist plugin:" + plugin.GetName()))
+			w.Write([]byte("the api use unexist plugin :" + plugin.GetName()))
 			return
 		}
 		plugin.ReceiveResponse(&ctx)

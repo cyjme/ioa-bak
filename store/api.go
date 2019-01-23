@@ -34,7 +34,7 @@ type Target struct {
 }
 
 func (api *Api) Put() error {
-	if api.Targets == nil{
+	if api.Targets == nil {
 		api.Targets = make([]Target, 0)
 	}
 	apiByte, err := json.Marshal(api)
@@ -100,8 +100,7 @@ func (api *Api) Watch(callback func()) {
 
 	for wresp := range responseWatchChannel {
 		for _, ev := range wresp.Events {
-			log.Debug("watch api change")
-			log.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+			log.Info("watch api data change", ev.Type, ev.Kv.Key, ev.Kv.Value)
 
 			callback()
 		}

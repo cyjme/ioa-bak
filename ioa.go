@@ -62,7 +62,7 @@ func (ioa *Ioa) Watch() {
 }
 
 func (ioa *Ioa) Load() {
-	log.Debug("ioa start Load data")
+	log.Info("start load apis/plugins from store")
 	ioa.Apis = make(map[string]Api)
 	ioa.Plugins = make(Plugins)
 	ioa.Router.Clear()
@@ -81,7 +81,7 @@ func (ioa *Ioa) Load() {
 			ConfigTpl: plugin.GetConfigTemplate(),
 		})
 	}
-	log.Debug("ReCreate plugins info to store")
+	log.Info("push plugins data to etcd store")
 	store.ReCreatePlugin(plugins)
 
 	//从数据库中加载 api
@@ -92,7 +92,7 @@ func (ioa *Ioa) Load() {
 		for _, plugin := range api.Plugins {
 			err := ioa.Plugins[plugin].InitApi(&api)
 			if err != nil {
-				log.Error(ioa.Plugins[plugin].GetName() + ERR_INIT_API_PLUGIN.Error() + err.Error())
+				log.Error(ioa.Plugins[plugin].GetName(), ERR_INIT_API_PLUGIN, err)
 			}
 		}
 	}
@@ -130,7 +130,7 @@ func (ioa *Ioa) LoadApi() {
 		}
 
 		if err := json.Unmarshal([]byte(api.Plugins), &newRawPlugins); err != nil {
-			log.Debug(err)
+			log.Error(ERR_API_GET_PLUGINS, err)
 			continue
 		}
 
