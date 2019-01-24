@@ -16,6 +16,7 @@ func Init() {
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
+		log.Error(ERR_STORE_CREATE_ETCD_CLIENT, err)
 		panic(err)
 	}
 }

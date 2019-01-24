@@ -40,11 +40,16 @@ func (api *Api) Put() error {
 	}
 	apiByte, err := json.Marshal(api)
 	if err != nil {
+		log.Error(ERR_STORE_CRUD_API, err)
 		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	_, err = clientv3.NewKV(client).Put(ctx, prefix+api.Id, string(apiByte))
+	if err != nil {
+		log.Error(ERR_STORE_CRUD_API, err)
+		return err
+	}
 	cancel()
 
 	return err
@@ -53,6 +58,9 @@ func (api *Api) Put() error {
 func (api *Api) Delete() error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	_, err := clientv3.NewKV(client).Delete(ctx, prefix+api.Id)
+	if err != nil {
+		log.Error(ERR_STORE_CRUD_API, err)
+	}
 	cancel()
 
 	return err
