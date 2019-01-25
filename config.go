@@ -11,9 +11,9 @@ type plugin struct {
 
 type Config struct {
 	Proxy struct {
-		Host      string `mapstructure:"host"`
-		Port      string `mapstructure:"port"`
-		MaxIdleConns int    `mapstructure:"maxIdleConns"`
+		Host                string `mapstructure:"host"`
+		Port                string `mapstructure:"port"`
+		MaxIdleConns        int    `mapstructure:"maxIdleConns"`
 		MaxIdleConnsPerHost int    `mapstructure:"maxIdleConnsPerHost"`
 	} `mapstructure:"proxy"`
 	Plugins []plugin `mapstructure:"plugins"`
@@ -25,9 +25,13 @@ func ReadConfig() Config {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./")
 	viper.SetConfigType("yml")
-	viper.ReadInConfig()
-	//viper.ReadConfig(bytes.NewBufferString(remoteConfig))
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Error(ERR_CONFIG_LOAD, err)
+		panic(err)
+	}
 	if err := viper.Unmarshal(&Config); err != nil {
+		log.Error(ERR_CONFIG_LOAD, err)
 		panic(err)
 	}
 
