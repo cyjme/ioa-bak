@@ -13,8 +13,8 @@ type Api struct {
 	Method     string `json:"method"`
 	Status     string `json:"status"`
 
-	Targets         []store.Target             `json:"targets"`
-	Plugins         []string                   `json:"plugins"`
+	Targets []store.Target `json:"targets"`
+	Plugins []string       `json:"plugins"`
 
 	PluginRawConfig map[string]json.RawMessage `json:"pluginRawConfig"`
 	PluginConfig    map[string]interface{}     `json:"pluginConfig"`
