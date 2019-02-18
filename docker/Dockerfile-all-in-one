@@ -1,0 +1,21 @@
+FROM alpine:latest
+RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+ADD ./dist/release.tar.gz /var
+ADD ./dist/dashboard.tar.gz /var
+
+RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz; \
+    tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz; \
+    mv etcd-v3.3.12-linux-amd64 /var; \
+    apk add nodejs; \
+    apk add npm; \
+    npm i -g http-server
+
+COPY ./dist/run.sh /
+
+VOLUME /data
+
+EXPOSE 9991
+EXPOSE 9992
+EXPOSE 9993
+
+ENTRYPOINT ["./run.sh"]
