@@ -15,11 +15,11 @@ const prefix = "apis/"
 type Api struct {
 	Id         string   `json:"id"`
 	ApiGroupId string   `json:"apiGroupId"`
-	Name       string   `json:"name"`
+	Name       string   `json:"name" binding:"required"`
 	Tags       []string `json:"tags"`
 	Describe   string   `json:"describe"`
-	Path       string   `json:"path"`
-	Method     string   `json:"method"`
+	Path       string   `json:"path" binding:"required"`
+	Method     string   `json:"method" binding:"required"`
 	Status     string   `json:"status"`
 
 	Targets []Target `json:"targets"`
