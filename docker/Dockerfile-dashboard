@@ -1,0 +1,12 @@
+FROM alpine:latest
+ADD ./dist/dashboard.tar.gz /var
+
+RUN apk add nodejs; \
+    apk add npm; \
+    npm i -g http-server
+
+WORKDIR /var/dashboard
+
+EXPOSE 9993
+
+ENTRYPOINT ["http-server","-p","9993"]

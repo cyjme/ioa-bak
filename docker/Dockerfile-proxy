@@ -1,7 +1,13 @@
 FROM alpine:latest
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
-ADD release.tar.gz /var
 
-EXPOSE 9991
+ENV PROXY_HOST 0.0.0.0
+ENV PROXY_PORT 9991
+ENV PROXY_MAXIDLE_CONNS 10000
+ENV PROXY_MAXIDLE_CONNS_PER_HOST 10000
 
-ENTRYPOINT ["/ioa-proxy"]
+ADD ./dist/release.tar.gz /var
+
+EXPOSE ${PROXY_PORT}
+
+ENTRYPOINT ["/var/release/ioa-proxy", "--host", "${PROXY_PORT}", "--port", "${PROXY_PORT}", "--maxIdleConns", "${PROXY_MAXIDLE_CONNS}", "--maxIdleConnsPerHost", "${PROXY_MAXIDLE_CONNS_PER_HOST}"]
