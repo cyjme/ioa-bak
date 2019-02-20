@@ -1,7 +1,14 @@
 FROM alpine:latest
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
-ADD ./dist/release.tar.gz /var
-ADD ./dist/dashboard.tar.gz /var
+
+ENV CONFIG_LOCATION /etc/ioa
+VOLUME ${CONFIG_LOCATION}
+
+ADD ./dist/plugins.tar.gz /
+ADD ./dist/release.tar.gz /
+ADD ./dist/dashboard.tar.gz /
+
+RUN mv /release/* usr/local/bin
 
 RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz; \
     tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz; \
@@ -13,9 +20,5 @@ RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-
 COPY ./dist/run.sh /
 
 VOLUME /data
-
-EXPOSE 9991
-EXPOSE 9992
-EXPOSE 9993
 
 ENTRYPOINT ["./run.sh"]

@@ -48,6 +48,7 @@ func (ioa *Ioa) StartServer() {
 	go ioa.Watch()
 
 	addr := ioa.Config.Proxy.Host + ":" + ioa.Config.Proxy.Port
+	log.Info("ioa proxy server starting, listen:" + addr)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		panic(err)

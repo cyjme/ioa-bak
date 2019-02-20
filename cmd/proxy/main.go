@@ -2,20 +2,27 @@ package main
 
 import (
 	"flag"
+	"github.com/coreos/etcd/clientv3"
 	"ioa"
 	"ioa/store"
+	"time"
 )
 
 func main() {
-	config := ioa.ReadConfig()
-
-	flag.StringVar(&config.Proxy.Host, "host", "0.0.0.0", "")
-	flag.StringVar(&config.Proxy.Port, "port", "9992", "")
-	flag.IntVar(&config.Proxy.MaxIdleConns, "maxIdleConns", 10000, "")
-	flag.IntVar(&config.Proxy.MaxIdleConnsPerHost, "maxIdleConnsPerHost", 10000, "")
+	var path string
+	flag.StringVar(&path, "config", "/etc/ioa", "")
 	flag.Parse()
 
-	store.Init()
+	config := ioa.ReadConfig(path)
+
+	etcdConfig := clientv3.Config{
+		Endpoints:   config.Etcd.Endpoints,
+		DialTimeout: time.Duration(config.Etcd.DialTimeout) * time.Second,
+		Username:    config.Etcd.Username,
+		Password:    config.Etcd.Password,
+	}
+
+	store.Init(etcdConfig)
 	Ioa := ioa.New(config)
 	Ioa.StartServer()
 }

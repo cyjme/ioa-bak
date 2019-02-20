@@ -4,9 +4,8 @@
 
 sleep 3
 
-cd /var/dashboard
+cd /dashboard
 http-server -p 9993 &
 
-cd /var/release
-/var/release/ioa-httpServer &
-/var/release/ioa-proxy
+ioa-httpServer --config $CONFIG_LOCATION &
+ioa-proxy --config $CONFIG_LOCATION

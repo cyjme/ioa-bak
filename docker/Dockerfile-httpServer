@@ -1,7 +1,12 @@
 FROM alpine:latest
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
-ADD release.tar.gz /var
 
-EXPOSE 9992
+ENV CONFIG_LOCATION /etc/ioa
+VOLUME ${CONFIG_LOCATION}
 
-ENTRYPOINT ["/var/release/ioa-httpServer"]
+ADD ./dist/release.tar.gz /
+RUN mv /release/* usr/local/bin
+
+RUN echo "ioa-httpServer --config $CONFIG_LOCATION" > /run.sh
+
+CMD ["/bin/sh","/run.sh"]
