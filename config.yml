@@ -1,6 +1,6 @@
 etcd:
   endpoints:
-    - "localhost:2379"
+    - "etcd:2379"
   dialTimeout: 5
   username: ""
   password: ""
