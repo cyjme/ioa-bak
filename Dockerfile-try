@@ -1,30 +1,37 @@
-FROM alpine:latest
-RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+FROM golang:alpine
 
-ENV CONFIG_LOCATION /etc/ioa
+ENV PROJECT_LOCATION /usr/local/src/ioa/
+ENV CONFIG_LOCATION /etc/ioa/
+COPY ./config.yml ${CONFIG_LOCATION}
 VOLUME ${CONFIG_LOCATION}
 
-ADD ./dist/plugins.tar.gz /
-ADD ./dist/release.tar.gz /
-ADD ./dist/dashboard.tar.gz /
+COPY . ${PROJECT_LOCATION}
 
-RUN mv /release/* usr/local/bin
+WORKDIR ${PROJECT_LOCATION}
+RUN make && \
+    mv release/* /usr/local/bin/
 
 RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz; \
     tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz; \
-    mv etcd-v3.3.12-linux-amd64 /var; \
+    mv etcd-v3.3.12-linux-amd64 /var
+
+WORKDIR /usr/local/src/
+RUN apk add git; \
     apk add nodejs; \
     apk add npm; \
     npm i -g http-server
 
+RUN git clone https://github.com/letsgo-tech/ioa-dashboard.git; \
+    cd ioa-dashboard; \
+    npm install; \
+    npm run build
+
 RUN echo "#!/bin/sh
           /var/etcd-v3.3.12-linux-amd64/etcd --data-dir="/data/etcd" &
           sleep 3
-          cd /dashboard
+          cd /usr/local/src/ioa-dashboard &
           http-server -p 9993 &
           ioa-httpServer --config $CONFIG_LOCATION &
           ioa-proxy --config $CONFIG_LOCATION" > /run.sh
-
-VOLUME /data
 
 ENTRYPOINT ["./run.sh"]

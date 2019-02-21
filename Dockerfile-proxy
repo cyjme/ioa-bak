@@ -11,6 +11,4 @@ WORKDIR ${PROJECT_LOCATION}
 RUN make && \
     mv release/* /usr/local/bin/
 
-RUN echo "ioa-proxy --config $CONFIG_LOCATION" > /run.sh
-
-ENTRYPOINT ["/bin/sh","/run.sh"]
+ENTRYPOINT ["ioa-proxy","--config","/etc/ioa/"]
