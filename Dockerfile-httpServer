@@ -10,6 +10,6 @@ RUN cd /usr/local/src/ioa && \
     make && \
     mv /release/* usr/local/bin
 
-RUN echo "ioa-proxy --config $CONFIG_LOCATION" > /run.sh
+RUN echo "ioa-httpServer --config $CONFIG_LOCATION" > /run.sh
 
 ENTRYPOINT ["/bin/sh","/run.sh"]
