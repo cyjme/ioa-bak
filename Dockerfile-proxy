@@ -8,9 +8,8 @@ VOLUME ${CONFIG_LOCATION}
 COPY . ${PROJECT_LOCATION}
 
 WORKDIR ${PROJECT_LOCATION}
-
 RUN make && \
-    mv release/* usr/local/bin/
+    mv release/* /usr/local/bin/
 
 RUN echo "ioa-proxy --config $CONFIG_LOCATION" > /run.sh
 
