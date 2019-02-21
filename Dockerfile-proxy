@@ -1,14 +1,16 @@
 FROM golang:1.11.2
 
+ENV PROJECT_LOCATION /usr/local/src/ioa/
 ENV CONFIG_LOCATION /etc/ioa/
 COPY ./config.yml ${CONFIG_LOCATION}
 VOLUME ${CONFIG_LOCATION}
 
-COPY . /usr/local/src/ioa/
+COPY . ${PROJECT_LOCATION}
 
-RUN cd /usr/local/src/ioa && \
-    make && \
-    mv /release/* usr/local/bin
+WORKDIR ${PROJECT_LOCATION}
+
+RUN make && \
+    mv release/* usr/local/bin/
 
 RUN echo "ioa-proxy --config $CONFIG_LOCATION" > /run.sh
 
