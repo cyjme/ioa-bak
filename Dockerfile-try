@@ -16,7 +16,7 @@ COPY . ${PROJECT_LOCATION}
 
 WORKDIR ${PROJECT_LOCATION}
 
-RUN make; \
+RUN make; && \
     mv release/* /usr/local/bin/
 
 RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz && \
@@ -30,7 +30,9 @@ RUN git clone https://github.com/letsgo-tech/ioa-dashboard.git; \
     npm install; \
     npm run build
 
-RUN echo "etcd --data-dir='/data/etcd' & ; \
+VOLUME /opt/etcd
+
+RUN echo "etcd --data-dir='/opt/etcd' & ; \
           sleep 3 ;\
           cd /usr/local/src/ioa-dashboard & ;\
           http-server -p 9993 & ;\
