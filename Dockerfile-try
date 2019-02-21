@@ -11,8 +11,8 @@ WORKDIR ${PROJECT_LOCATION}
 RUN make && \
     mv release/* /usr/local/bin/
 
-RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz; \
-    tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz; \
+RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz && \
+    tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz && \
     mv etcd-v3.3.12-linux-amd64/etcd /usr/local/bin/
 
 WORKDIR /usr/local/src/
