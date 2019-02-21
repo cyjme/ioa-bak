@@ -13,7 +13,7 @@ RUN make && \
 
 RUN wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz; \
     tar -zxvf etcd-v3.3.12-linux-amd64.tar.gz; \
-    mv etcd-v3.3.12-linux-amd64 /var
+    mv etcd-v3.3.12-linux-amd64/etcd /usr/local/bin/
 
 WORKDIR /usr/local/src/
 RUN apk add git; \
@@ -27,7 +27,7 @@ RUN git clone https://github.com/letsgo-tech/ioa-dashboard.git; \
     npm run build
 
 RUN echo "#!/bin/sh
-          /var/etcd-v3.3.12-linux-amd64/etcd --data-dir="/data/etcd" &
+          etcd --data-dir="/data/etcd" &
           sleep 3
           cd /usr/local/src/ioa-dashboard &
           http-server -p 9993 &
