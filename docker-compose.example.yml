@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  proxy:
+    image: cyjme/ioa-proxy:latest
+    depends_on:
+      - etcd
+    ports:
+      - "80:9991"
+    volumes:
+      - .:/etc/ioa
+  
+  httpserver:
+    image: cyjme/ioa-httpserver:latest
+    depends_on:
+      - etcd
+    ports:
+      - "9992:9992"
+    volumes:
+      - .:/etc/ioa
+
+  dashboard:
+    image: cyjme/ioa-dashboard:latest
+    ports:
+      - "9993:9993"
+
+  etcd:
+    image: bitnami/etcd:latest
+    ports:
+      - "2379:2379"
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+
