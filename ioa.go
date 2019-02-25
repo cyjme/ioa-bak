@@ -117,15 +117,14 @@ func (ioa *Ioa) LoadApi() {
 		panic(err)
 	}
 
-	var newApiPlugins []string
-	newApiPluginsConfig := make(map[string]json.RawMessage)
-
 	type rawPlugin struct {
 		Name   string
 		Config json.RawMessage
 	}
 	for _, api := range apis {
 		var newRawPlugins []rawPlugin
+		var newApiPlugins []string
+		newApiPluginsConfig := make(map[string]json.RawMessage)
 
 		if api.Plugins == "" {
 			api.Plugins = "[]"
