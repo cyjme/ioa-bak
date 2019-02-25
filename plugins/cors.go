@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"ioa"
 	"ioa/proto"
+	"net/http"
 )
 
 var (
@@ -135,6 +136,15 @@ func (i Plugin) ReceiveRequest(ctx *ioa.Context) {
 	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", config.AllowHeaders)
 	ctx.ResponseWriter.Header().Set("Access-Control-Expose-Headers", config.ExposeHeaders)
 	ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", config.AllowCredentials)
+
+	if ctx.Request.Method == http.MethodOptions {
+		ctx.ResponseWriter.WriteHeader(http.StatusOK)
+		_, err := ctx.ResponseWriter.Write(nil)
+		if err != nil {
+			i.Logger().Info("ResponseWriter.Writer err", err)
+		}
+		ctx.Cancel()
+	}
 }
 
 func (i Plugin) ReceiveResponse(ctx *ioa.Context) {
