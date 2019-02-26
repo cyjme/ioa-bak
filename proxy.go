@@ -10,7 +10,7 @@ import (
 func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 	path := r.URL.Path
-	apiId, _, _ := ioa.Router.FindRoute(method, path)
+	apiId, params, _ := ioa.Router.FindRoute(method, path)
 
 	if apiId == "" {
 		w.WriteHeader(404)
@@ -50,7 +50,13 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	target := api.Targets[rand.Intn(len(api.Targets))]
 
-	url := target.Scheme + target.Host + ":" + target.Port + target.Path
+	targetPath := target.Path
+	for _, param := range params {
+		targetPath = strings.Replace(targetPath, ":"+param.Key, param.Value, 1)
+		targetPath = strings.Replace(targetPath, "*"+param.Key, param.Value, 1)
+	}
+
+	url := target.Scheme + target.Host + ":" + target.Port + targetPath
 	newReq, err := http.NewRequest(strings.ToUpper(target.Method), url, r.Body)
 	newReq.Header = r.Header
 	if err != nil {
