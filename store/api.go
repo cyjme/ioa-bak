@@ -5,12 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/coreos/etcd/clientv3"
-	logger "ioa/log"
 )
-
-var log = logger.Get()
-
-const prefix = "apis/"
 
 type Api struct {
 	Id         string   `json:"id"`
@@ -24,12 +19,15 @@ type Api struct {
 
 	Targets []Target `json:"targets"`
 	Plugins string   `json:"plugins"`
+
+	Policies     []string `json:"policies"`
+	PoliciesData []Policy `json:"policiesData"`
 }
 
 type Target struct {
 	Scheme string `json:"scheme"`
 	Method string `json:"method"`
-	Host   string `json:"host"`
+	Host   string `json:"Host"`
 	Port   string `json:"port"`
 	Path   string `json:"path"`
 }
@@ -45,7 +43,7 @@ func (api *Api) Put() error {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	_, err = clientv3.NewKV(client).Put(ctx, prefix+api.Id, string(apiByte))
+	_, err = clientv3.NewKV(client).Put(ctx, apiPrefix+api.Id, string(apiByte))
 	if err != nil {
 		log.Error(ERR_STORE_CRUD_API, err)
 		return err
@@ -57,7 +55,7 @@ func (api *Api) Put() error {
 
 func (api *Api) Delete() error {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	_, err := clientv3.NewKV(client).Delete(ctx, prefix+api.Id)
+	_, err := clientv3.NewKV(client).Delete(ctx, apiPrefix+api.Id)
 	if err != nil {
 		log.Error(ERR_STORE_CRUD_API, err)
 	}
@@ -68,7 +66,7 @@ func (api *Api) Delete() error {
 
 func (api *Api) List() ([]Api, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	res, err := clientv3.NewKV(client).Get(ctx, prefix, clientv3.WithPrefix())
+	res, err := clientv3.NewKV(client).Get(ctx, apiPrefix, clientv3.WithPrefix())
 	cancel()
 	if err != nil {
 		return nil, 0, err
@@ -80,6 +78,19 @@ func (api *Api) List() ([]Api, int, error) {
 		if err != nil {
 			return nil, 0, err
 		}
+
+		for _, policyId := range api.Policies {
+			policy := &Policy{
+				Id: policyId,
+			}
+			policy, err := policy.Get()
+			if err != nil {
+				log.Error(ERR_STORE_CRUD_API, err)
+				continue
+			}
+			api.PoliciesData = append(api.PoliciesData, *policy)
+		}
+
 		apis = append(apis, api)
 	}
 
@@ -91,7 +102,7 @@ func (api *Api) List() ([]Api, int, error) {
 
 func (api *Api) Get() (*Api, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	res, err := clientv3.NewKV(client).Get(ctx, prefix+api.Id)
+	res, err := clientv3.NewKV(client).Get(ctx, apiPrefix+api.Id)
 	cancel()
 	if err != nil {
 		return nil, err
@@ -105,7 +116,7 @@ func (api *Api) Get() (*Api, error) {
 }
 
 func (api *Api) Watch(callback func()) {
-	responseWatchChannel := client.Watch(context.Background(), prefix, clientv3.WithPrefix())
+	responseWatchChannel := client.Watch(context.Background(), apiPrefix, clientv3.WithPrefix())
 
 	for wresp := range responseWatchChannel {
 		for _, ev := range wresp.Events {

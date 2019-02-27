@@ -1,8 +1,11 @@
 package router
 
 import (
+	logger "ioa/log"
 	"ioa/router/httprouter"
 )
+
+var log = logger.Get()
 
 type Router struct {
 	router *httprouter.Router
@@ -16,7 +19,8 @@ func New() Router {
 
 func (r Router) AddRoute(method string, path string, routeId string) error {
 	existRouteId, _, _ := r.router.Lookup(method, path)
-	if existRouteId == "" {
+	if existRouteId != "" {
+		log.Error(ERR_ROUTER_ADD_EXISTED)
 		return ERR_ROUTER_ADD_EXISTED
 	}
 	r.router.Handle(method, path, routeId)

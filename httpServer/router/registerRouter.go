@@ -27,6 +27,16 @@ func RegisterRouter(r *gin.Engine) {
 		apiGroup.GET("/:apiId", apiController.Get)
 	}
 
+	policyController := controller.PolicyController{}
+	policyGroup := r.Group("/policies")
+	{
+		policyGroup.GET("", policyController.List)
+		policyGroup.POST("", policyController.Create)
+		policyGroup.DELETE("/:policyId", policyController.Delete)
+		policyGroup.PUT("/:policyId", policyController.Put)
+		policyGroup.GET("/:policyId", policyController.Get)
+	}
+
 	r.GET("/apisWithTag", apiController.ListWithTag)
 
 	pluginController := controller.PluginController{}

@@ -61,6 +61,10 @@ func (ioa *Ioa) Watch() {
 	go api.Watch(func() {
 		ioa.Load()
 	})
+	policy := store.Policy{}
+	go policy.Watch(func() {
+		ioa.Load()
+	})
 }
 
 func (ioa *Ioa) Load() {
@@ -108,10 +112,13 @@ func (ioa *Ioa) loadApiToRouter() {
 	for id, api := range ioa.Apis {
 		err := ioa.Router.AddRoute(strings.ToUpper(api.Method), api.Path, id)
 		if err != nil {
-			log.Error(ERR_ROUTER_ADD_EXISTED)
+			log.Error(err)
 		}
 	}
 }
+
+type pluginNames []string
+type pluginRawConfigs map[string]json.RawMessage
 
 func (ioa *Ioa) LoadApi() {
 	api := store.Api{}
@@ -121,27 +128,33 @@ func (ioa *Ioa) LoadApi() {
 		panic(err)
 	}
 
-	type rawPlugin struct {
-		Name   string
-		Config json.RawMessage
-	}
 	for _, api := range apis {
-		var newRawPlugins []rawPlugin
-		var newApiPlugins []string
-		newApiPluginsConfig := make(map[string]json.RawMessage)
-
-		if api.Plugins == "" {
-			api.Plugins = "[]"
-		}
-
-		if err := json.Unmarshal([]byte(api.Plugins), &newRawPlugins); err != nil {
-			log.Error(ERR_API_GET_PLUGINS, err)
+		//获取 api 中定义的 plugin 和 rawConfig
+		apiPluginNames, apiPluginRawConfigs, err := convPluginsString(api.Plugins)
+		if err != nil {
+			log.Error(ERR_INIT_API_PLUGIN)
 			continue
 		}
 
-		for _, rawPlugin := range newRawPlugins {
-			newApiPlugins = append(newApiPlugins, rawPlugin.Name)
-			newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
+		//获取 api 中的 policies 中定义的 plugins, 和 api 的进行合并，api 中的 plugin 优先级更高
+		var apiPoliciesPluginNames pluginNames
+		var apiPoliciesPluginRawConfigs pluginRawConfigs
+		for _, policy := range api.PoliciesData {
+			plugins := policy.Plugins
+			apiPoliciesPluginNames, apiPoliciesPluginRawConfigs, err = convPluginsString(plugins)
+
+			if err != nil {
+				log.Error(ERR_INIT_API_PLUGIN)
+				continue
+			}
+
+			for _, apiPoliciesPluginName := range apiPoliciesPluginNames {
+				if inArray(apiPluginNames, apiPoliciesPluginName) {
+					continue
+				}
+				apiPluginNames = append(apiPluginNames, apiPoliciesPluginName)
+				apiPluginRawConfigs[apiPoliciesPluginName] = apiPoliciesPluginRawConfigs[apiPoliciesPluginName]
+			}
 		}
 
 		for _, method := range api.Methods {
@@ -153,8 +166,8 @@ func (ioa *Ioa) LoadApi() {
 				Method:          method,
 				Status:          api.Status,
 				Targets:         api.Targets,
-				Plugins:         newApiPlugins,
-				PluginRawConfig: newApiPluginsConfig,
+				Plugins:         apiPluginNames,
+				PluginRawConfig: apiPluginRawConfigs,
 				PluginConfig:    make(map[string]interface{}),
 				PluginsData:     make(map[string]interface{}),
 			}
@@ -164,4 +177,40 @@ func (ioa *Ioa) LoadApi() {
 	}
 
 	log.Debug("load api from store to ioa", ioa.Apis)
+}
+
+func convPluginsString(plugins string) (pluginNames, pluginRawConfigs, error) {
+	type rawPlugin struct {
+		Name   string
+		Config json.RawMessage
+	}
+
+	var newRawPlugins []rawPlugin
+	var newApiPlugins []string
+	newApiPluginsConfig := make(map[string]json.RawMessage)
+
+	if plugins == "" {
+		plugins = "[]"
+	}
+
+	if err := json.Unmarshal([]byte(plugins), &newRawPlugins); err != nil {
+		log.Error(ERR_API_GET_PLUGINS, err)
+		return nil, nil, err
+	}
+
+	for _, rawPlugin := range newRawPlugins {
+		newApiPlugins = append(newApiPlugins, rawPlugin.Name)
+		newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
+	}
+	return newApiPlugins, newApiPluginsConfig, nil
+}
+
+func inArray(array []string, val string) bool {
+	for _, item := range array {
+		if item == val {
+			return true
+		}
+	}
+
+	return false
 }
