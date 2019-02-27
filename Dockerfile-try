@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:1.12.0
 
 ENV PROJECT_LOCATION /usr/local/src/ioa/
 ENV CONFIG_LOCATION /etc/ioa/
