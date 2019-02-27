@@ -19,7 +19,7 @@ type Api struct {
 	Tags       []string `json:"tags"`
 	Describe   string   `json:"describe"`
 	Path       string   `json:"path" binding:"required"`
-	Method     string   `json:"method" binding:"required"`
+	Methods    []string `json:"methods" binding:"required"`
 	Status     string   `json:"status"`
 
 	Targets []Target `json:"targets"`

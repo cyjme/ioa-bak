@@ -9,6 +9,14 @@ import (
 
 func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
+
+	//todo
+	if method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		w.Write(nil)
+		return
+	}
+
 	path := r.URL.Path
 	apiId, params, _ := ioa.Router.FindRoute(method, path)
 
@@ -57,6 +65,9 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := target.Scheme + target.Host + ":" + target.Port + targetPath
+	if target.Method == "*" || target.Method == "" {
+		target.Method = r.Method
+	}
 	newReq, err := http.NewRequest(strings.ToUpper(target.Method), url, r.Body)
 	newReq.Header = r.Header
 	if err != nil {

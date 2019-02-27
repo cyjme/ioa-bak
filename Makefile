@@ -28,7 +28,7 @@ dev:
 	go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
 	go build -buildmode=plugin -o ./plugins/cors.so ./plugins/cors.go
 	go build -buildmode=plugin -o ./plugins/jwt.so ./plugins/jwt.go
-	go run cmd/proxy/main.go
+	go run cmd/proxy/main.go -config ./
 
 linux:
 	docker run -v "$$GOPATH":/go --rm -v "$$PWD":/go/src/myapp -w /go/src/myapp -e=GOOS=linux -e=GOARCH=amd64 -e=GO111MODULE=on  golang:latest make

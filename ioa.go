@@ -3,6 +3,7 @@ package ioa
 import (
 	"encoding/json"
 	"fmt"
+	"ioa/httpServer/pkg/util"
 	logger "ioa/log"
 	"ioa/monitor"
 	"ioa/proto"
@@ -140,22 +141,23 @@ func (ioa *Ioa) LoadApi() {
 			newApiPluginsConfig[rawPlugin.Name] = rawPlugin.Config
 		}
 
-		newApi := Api{
-			ApiGroupId: api.ApiGroupId,
-			Name:       api.Name,
-			Describe:   api.Describe,
-			Path:       api.Path,
-			Method:     api.Method,
-			Status:     api.Status,
+		for _, method := range api.Methods {
+			newApi := Api{
+				ApiGroupId:      api.ApiGroupId,
+				Name:            api.Name,
+				Describe:        api.Describe,
+				Path:            api.Path,
+				Method:          method,
+				Status:          api.Status,
+				Targets:         api.Targets,
+				Plugins:         newApiPlugins,
+				PluginRawConfig: newApiPluginsConfig,
+				PluginConfig:    make(map[string]interface{}),
+				PluginsData:     make(map[string]interface{}),
+			}
 
-			Targets:         api.Targets,
-			Plugins:         newApiPlugins,
-			PluginRawConfig: newApiPluginsConfig,
-			PluginConfig:    make(map[string]interface{}),
-			PluginsData:     make(map[string]interface{}),
+			ioa.Apis[util.GetRandomString(11)] = newApi
 		}
-
-		ioa.Apis[api.Id] = newApi
 	}
 
 	log.Debug("load api from store to ioa", ioa.Apis)
