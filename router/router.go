@@ -14,8 +14,14 @@ func New() Router {
 	}
 }
 
-func (r Router) AddRoute(method string, path string, routeId string) {
+func (r Router) AddRoute(method string, path string, routeId string) error {
+	existRouteId, _, _ := r.router.Lookup(method, path)
+	if existRouteId == "" {
+		return ERR_ROUTER_ADD_EXISTED
+	}
 	r.router.Handle(method, path, routeId)
+
+	return nil
 }
 
 func (r Router) FindRoute(method string, path string) (string, httprouter.Params, bool) {

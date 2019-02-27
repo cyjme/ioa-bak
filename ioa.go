@@ -106,7 +106,10 @@ func (ioa *Ioa) Load() {
 
 func (ioa *Ioa) loadApiToRouter() {
 	for id, api := range ioa.Apis {
-		ioa.Router.AddRoute(strings.ToUpper(api.Method), api.Path, id)
+		err := ioa.Router.AddRoute(strings.ToUpper(api.Method), api.Path, id)
+		if err != nil {
+			log.Error(ERR_ROUTER_ADD_EXISTED)
+		}
 	}
 }
 
