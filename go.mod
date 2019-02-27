@@ -1,5 +1,7 @@
 module ioa
 
+go 1.12
+
 require (
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
 	github.com/coreos/bbolt v1.3.2 // indirect
