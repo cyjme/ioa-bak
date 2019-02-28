@@ -109,6 +109,19 @@ func (api *Api) Get() (*Api, error) {
 	}
 
 	err = json.Unmarshal(res.Kvs[0].Value, api)
+
+	for _, policyId := range api.Policies {
+		policy := &Policy{
+			Id: policyId,
+		}
+		policy, err := policy.Get()
+		if err != nil {
+			log.Error(ERR_STORE_CRUD_API, err)
+			continue
+		}
+		api.PoliciesData = append(api.PoliciesData, *policy)
+	}
+
 	if err != nil {
 		return nil, err
 	}
