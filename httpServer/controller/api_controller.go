@@ -4,7 +4,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"ioa/httpServer/pkg"
-	"ioa/httpServer/pkg/util"
+	"ioa/util"
 	"ioa/store"
 	"net/http"
 )

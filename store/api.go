@@ -36,6 +36,7 @@ func (api *Api) Put() error {
 	if api.Targets == nil {
 		api.Targets = make([]Target, 0)
 	}
+	api.PoliciesData = []Policy{}
 	apiByte, err := json.Marshal(api)
 	if err != nil {
 		log.Error(ERR_STORE_CRUD_API, err)
