@@ -27,7 +27,7 @@ type Api struct {
 type Target struct {
 	Scheme string `json:"scheme"`
 	Method string `json:"method"`
-	Host   string `json:"Host"`
+	Host   string `json:"host"`
 	Port   string `json:"port"`
 	Path   string `json:"path"`
 }
