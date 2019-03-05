@@ -68,7 +68,7 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 		targetPath = strings.Replace(targetPath, "*"+param.Key, param.Value, 1)
 	}
 
-	url := target.Scheme + target.Host + ":" + target.Port + targetPath
+	url := target.Scheme + target.Host + ":" + target.Port + targetPath + "?" + r.URL.RawQuery
 	if target.Method == "*" || target.Method == "" {
 		target.Method = r.Method
 	}
