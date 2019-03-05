@@ -12,6 +12,10 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 
 	//todo
 	if method == http.MethodOptions {
+		w.Header().Set("access-control-allow-headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since,token")
+		w.Header().Set("access-control-allow-methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
+		w.Header().Set("access-control-allow-origin", "*")
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(nil)
 		return
