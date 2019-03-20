@@ -20,6 +20,7 @@ all:
 	#	go build -buildmode=plugin -o ./plugins/$$BASENAME.so ./plugins/size.go ;\
 	#done
 dev:
+	go build -buildmode=plugin -o ./plugins/default_response.so ./plugins/default_response.go
 	go build -buildmode=plugin -o ./plugins/cache.so ./plugins/cache.go
 	go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.go
 	go build -buildmode=plugin -o ./plugins/size.so ./plugins/size.go

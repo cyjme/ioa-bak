@@ -84,9 +84,11 @@ func (ioa *Ioa) reverseProxy(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		log.Debug(ERR_PROXY_DO_REQUEST, err)
+		ctx.Response = new(http.Response)
+	} else {
+		ctx.Response = resp
 	}
 
-	ctx.Response = resp
 	for _, plugin := range api.Plugins {
 		plugin, exist := ioa.Plugins[plugin]
 		if !exist {
