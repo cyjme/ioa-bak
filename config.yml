@@ -1,6 +1,6 @@
 etcd:
   endpoints:
-    - "etcd:2379"
+    - "localhost:2379"
   dialTimeout: 5
   username: ""
   password: ""
@@ -17,19 +17,22 @@ httpServer:
 
 plugins:
   - name: "copy_request"
-    path: "/usr/local/src/ioa/plugins/copy_request.so"
+    path: "plugins/copy_request.so"
   - name: "request_size"
-    path: "/usr/local/src/ioa/plugins/size.so"
+    path: "plugins/size.so"
   - name: "rate_limit"
-    path: "/usr/local/src/ioa/plugins/rate.so"
+    path: "plugins/rate.so"
   - name: "ip_black"
-    path: "/usr/local/src/ioa/plugins/black.so"
+    path: "plugins/black.so"
   - name: "ip_white"
-    path: "/usr/local/src/ioa/plugins/white.so"
+    path: "plugins/white.so"
   - name: "cors"
-    path: "/usr/local/src/ioa/plugins/cors.so"
+    path: "plugins/cors.so"
   - name: "jwt"
-    path: "/usr/local/src/ioa/plugins/jwt.so"
+    path: "plugins/jwt.so"
   - name: "cache"
-    path: "/usr/local/src/ioa/plugins/cache.so"
-
+    path: "plugins/cache.so"
+  - name: "default_response"
+    path: "plugins/default_response.so"
+  - name: "token_to_userId"
+    path: "plugins/token_to_userId.so"
