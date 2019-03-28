@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	name = "token-to-userId"
+	name = "token_to_userId"
 	desc = "get userId from authorization bearer token"
 	tags = []string{"security"}
 )
