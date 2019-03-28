@@ -10,7 +10,7 @@ all:
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/white.so ./plugins/white.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/cors.so ./plugins/cors.go
 	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/jwt.so ./plugins/jwt.go
-	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.g
+	GOOS=linux GOARCH=amd64 go build -buildmode=plugin -o ./plugins/copy_request.so ./plugins/copy_request.go
 	GOOS=linux GOARCH=amd64	go build -buildmode=plugin -o ./plugins/default_response.so ./plugins/default_response.go
 	GOOS=linux GOARCH=amd64	go build -buildmode=plugin -o ./plugins/token_to_userId.so ./plugins/token_to_userId.go
 	#rm -rf plugins/*.so
